@@ -94,7 +94,10 @@ export function ProjectsHome() {
                     }}
                   />
                 </span>
-                {preset.label}
+                <span className='text-center leading-tight'>
+                  <span className='block font-medium'>{preset.value}</span>
+                  {preset.label.replace(`${preset.value} `, '')}
+                </span>
               </button>
             ))}
             <div className='ml-auto flex gap-2'>

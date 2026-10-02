@@ -41,10 +41,10 @@ function useLut(src: string, enabled: boolean) {
   return enabled && lut?.src === src ? lut : null;
 }
 
-function useGl(grade: Grade, softness: number) {
+function useGl(grade: Grade | null, softness: number) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const rendererRef = useRef<GradeRenderer | null>(null);
-  const lut = useLut(grade.lut.src, grade.lut.enabled);
+  const lut = useLut(grade?.lut.src ?? '', grade?.lut.enabled ?? false);
   const frame = useCurrentFrame();
   const state = useRef({ grade, softness, frame, lut });
   state.current = { grade, softness, frame, lut };
@@ -60,7 +60,7 @@ function useGl(grade: Grade, softness: number) {
 
   const draw = useCallback((source: TexImageSource, width: number, height: number) => {
     const renderer = rendererRef.current;
-    if (!renderer || !width || !height) return;
+    if (!renderer || !width || !height || !state.current.grade) return;
     const { grade: g, softness: s, frame: f, lut: l } = state.current;
     renderer.setLut(l?.lut ?? null, l?.src ?? '');
     const scale = Math.min(1, MAX_GL_SIZE / Math.max(width, height));
@@ -82,7 +82,7 @@ interface VideoMediaProps {
 
 export function VideoMedia({ src, sourceIn, speed, volume, muted, grade, softness }: VideoMediaProps) {
   const { isRendering } = useRemotionEnvironment();
-  const gl = useGl(grade ?? ({} as Grade), softness);
+  const gl = useGl(grade, softness);
   const Component = isRendering ? OffthreadVideo : Html5Video;
   const onVideoFrame = useCallback(
     (frame: CanvasImageSource) => {
@@ -115,7 +115,7 @@ export function VideoMedia({ src, sourceIn, speed, volume, muted, grade, softnes
 }
 
 export function ImageMedia({ src, grade, softness }: { src: string; grade: Grade | null; softness: number }) {
-  const gl = useGl(grade ?? ({} as Grade), softness);
+  const gl = useGl(grade, softness);
   const [image, setImage] = useState<HTMLImageElement | null>(null);
   const frame = useCurrentFrame();
 
