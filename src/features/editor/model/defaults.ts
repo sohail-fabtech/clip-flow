@@ -98,7 +98,7 @@ export const defaultTextStyle = (): TextStyle => ({
   fontFamily: 'Roboto-Bold',
   fontUrl: 'https://fonts.gstatic.com/s/roboto/v29/KFOlCnqEu92Fr1MmWUlvAx05IsDqlA.ttf',
   fontSize: 96,
-  fontWeight: 700,
+  fontWeight: 400,
   italic: false,
   underline: false,
   uppercase: false,
