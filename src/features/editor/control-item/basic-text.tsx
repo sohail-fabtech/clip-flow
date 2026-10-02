@@ -331,7 +331,7 @@ const BasicText = ({ trackItem, type }) => {
       component: (
         <Outline
           label='Font stroke'
-          onChageBorderWidth={v => onChangeBorderWidth(v)}
+          onChangeBorderWidth={v => onChangeBorderWidth(v)}
           onChangeBorderColor={v => onChangeBorderColor(v)}
           valueBorderWidth={properties.borderWidth}
           valueBorderColor={properties.borderColor}
