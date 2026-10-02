@@ -4,7 +4,7 @@ import path from 'node:path';
 import { Readable } from 'node:stream';
 import { nanoid } from 'nanoid';
 
-export const STORAGE_DIR = path.join(process.cwd(), 'storage');
+const STORAGE_DIR = path.join(process.cwd(), 'storage');
 
 const CONTENT_TYPES: Record<string, string> = {
   '.mp4': 'video/mp4',
@@ -35,7 +35,10 @@ export const extensionOf = (contentType: string) => EXTENSIONS[contentType.split
 export const isMediaType = (contentType: string) => /^(video|audio|image)\//.test(contentType);
 
 export function storageKey(folder: 'uploads' | 'renders' | 'voice-overs', fileName: string) {
-  const safe = path.basename(fileName).replace(/[^\w.-]+/g, '_').slice(-80);
+  const safe = path
+    .basename(fileName)
+    .replace(/[^\w.-]+/g, '_')
+    .slice(-80);
   return `${folder}/${nanoid(10)}-${safe}`;
 }
 

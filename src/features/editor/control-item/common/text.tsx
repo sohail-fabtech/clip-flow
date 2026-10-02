@@ -145,7 +145,15 @@ const FontFamily = ({ family, onSelect }: { family: string; onSelect: (font: Fon
   );
 };
 
-const FontStyle = ({ font, current, onSelect }: { font: CompactFont | null; current: string; onSelect: (font: FontInfo) => void }) => (
+const FontStyle = ({
+  font,
+  current,
+  onSelect,
+}: {
+  font: CompactFont | null;
+  current: string;
+  onSelect: (font: FontInfo) => void;
+}) => (
   <Row label='Weight'>
     <Popover>
       <PopoverTrigger asChild>

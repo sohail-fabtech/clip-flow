@@ -10,7 +10,6 @@ import { AUDIOS } from '@/features/editor/data/audio';
 
 type AudioTrack = (typeof AUDIOS)[number];
 
-
 export const Audios = () => {
   const isDraggingOverTimeline = useIsDraggingOverTimeline();
 
@@ -47,11 +46,15 @@ interface AudioItemProps {
 
 const AudioItem = ({ handleAddAudio, audio, shouldDisplayPreview }: AudioItemProps) => {
   return (
-    <Draggable data={audio} renderCustomPreview={
+    <Draggable
+      data={audio}
+      renderCustomPreview={
         <div className='flex h-[70px] w-[70px] items-center justify-center rounded bg-[#27272A] text-white'>
           <Music width={24} />
         </div>
-      } shouldDisplayPreview={shouldDisplayPreview}>
+      }
+      shouldDisplayPreview={shouldDisplayPreview}
+    >
       <div
         draggable={false}
         onClick={() => handleAddAudio(audio)}

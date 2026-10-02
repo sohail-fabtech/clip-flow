@@ -56,7 +56,7 @@ const Ruler = ({ scrollLeft, onClick, onScroll }: RulerProps) => {
       for (let value = Math.max(0, minRange); value <= maxRange; value++) {
         const startPos = value * zoomUnit - scrollLeft;
         if (startPos < -zoomUnit || startPos >= width + zoomUnit) continue;
-        const text = formatTimelineUnit(value * zoomUnit / zoom);
+        const text = formatTimelineUnit((value * zoomUnit) / zoom);
         context.fillText(text, startPos + offsetX - context.measureText(text).width / 2, TEXT_OFFSET_Y);
 
         for (let segment = 1; segment < segments; segment++) {

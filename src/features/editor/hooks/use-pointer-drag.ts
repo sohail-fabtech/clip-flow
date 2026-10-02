@@ -1,6 +1,6 @@
 import { useRef, useState, type PointerEvent } from 'react';
 
-export interface DragMove<T> {
+interface DragMove<T> {
   x: number;
   y: number;
   deltaX: number;

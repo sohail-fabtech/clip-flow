@@ -24,7 +24,10 @@ import { loadProject } from '@/features/editor/services/project';
 import { SECONDARY_FONT, SECONDARY_FONT_URL } from '@/features/editor/constants/constants';
 import { FONTS } from '@/features/editor/data/fonts';
 
-const stateManager = new StateManager({ size: { width: 1080, height: 1920 } });
+const stateManager = new StateManager(
+  { size: { width: 1080, height: 1920 } },
+  { cors: { audio: false, video: false, image: false } },
+);
 
 const TIMELINE_CHROME = { height: 90, width: 40 };
 
@@ -33,8 +36,12 @@ function Editor() {
   const [trackItem, setTrackItem] = useState<TrackItem | null>(null);
   const sceneRef = useRef<SceneHandle>(null);
   const { timeline, playerRef, activeIds, trackItemsMap } = useStore();
-  const { setTrackItem: setLayoutTrackItem, setFloatingControl, setLabelControlItem, setTypeControlItem } =
-    useLayoutStore();
+  const {
+    setTrackItem: setLayoutTrackItem,
+    setFloatingControl,
+    setLabelControlItem,
+    setTypeControlItem,
+  } = useLayoutStore();
   const { setCompactFonts, setFonts } = useDataState();
   const isLargeScreen = useIsLargeScreen();
 

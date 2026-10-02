@@ -74,8 +74,11 @@ class Audio extends Trimmable {
   }
 
   async initialize() {
-    const audioData = await getAudioData(this.src);
-    this.barData = audioData;
+    try {
+      this.barData = await getAudioData(this.src);
+    } catch {
+      return;
+    }
     this.bars = this.getBars(0, 0) || [];
     this.canvas?.requestRenderAll();
     this.onScrollChange({ scrollLeft: 0 });

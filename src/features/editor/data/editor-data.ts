@@ -7,7 +7,8 @@ export const UPLOAD_DATA = [
     contentType: 'video/mp4',
     metadata: {
       originalUrl: 'https://videos.pexels.com/video-files/6963395/6963395-sd_240_426_25fps.mp4',
-      thumbnailUrl: 'https://images.pexels.com/videos/6963395/eco-friendly-environment-environmentally-friendly-mothernature-6963395.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=1200&w=630',
+      thumbnailUrl:
+        'https://images.pexels.com/videos/6963395/eco-friendly-environment-environmentally-friendly-mothernature-6963395.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=1200&w=630',
     },
     folder: 'vacation',
     type: 'video',
@@ -24,7 +25,8 @@ export const UPLOAD_DATA = [
     contentType: 'video/mp4',
     metadata: {
       originalUrl: 'https://videos.pexels.com/video-files/5386411/5386411-sd_226_426_25fps.mp4',
-      thumbnailUrl: 'https://images.pexels.com/videos/5386411/pexels-photo-5386411.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=1200&w=630',
+      thumbnailUrl:
+        'https://images.pexels.com/videos/5386411/pexels-photo-5386411.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=1200&w=630',
     },
     folder: 'marketing',
     type: 'video',

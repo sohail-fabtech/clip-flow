@@ -10,9 +10,9 @@ type ColorPickerProps = {
 export function ColorPicker({ value = '#ffffff', onChange }: ColorPickerProps) {
   return (
     <ChromaPanel
-      theme="dark"
+      theme='dark'
       value={value}
-      format="hex"
+      format='hex'
       showAlpha
       showTitleBar={false}
       onChangeComplete={color => onChange(color.hexa)}

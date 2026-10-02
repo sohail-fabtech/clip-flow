@@ -42,7 +42,11 @@ export function useMediaSections(kind: MediaKind, source?: TrackItem | null, com
           <Label className='font-sans text-xs font-semibold'>Basic</Label>
           {compact && <AspectRatio />}
           {kind === 'video' && (
-            <SliderControl label='Volume' value={details.volume ?? 100} onChange={volume => updateDetails({ volume })} />
+            <SliderControl
+              label='Volume'
+              value={details.volume ?? 100}
+              onChange={volume => updateDetails({ volume })}
+            />
           )}
           {kind === 'image' && (
             <SliderControl
@@ -52,7 +56,11 @@ export function useMediaSections(kind: MediaKind, source?: TrackItem | null, com
               onChange={borderRadius => updateDetails({ borderRadius })}
             />
           )}
-          <SliderControl label='Opacity' value={details.opacity ?? 100} onChange={opacity => updateDetails({ opacity })} />
+          <SliderControl
+            label='Opacity'
+            value={details.opacity ?? 100}
+            onChange={opacity => updateDetails({ opacity })}
+          />
           {kind === 'video' && (
             <>
               <Speed value={properties.playbackRate ?? 1} onChange={playbackRate => update({ playbackRate })} />
@@ -100,7 +108,10 @@ export function useAudioSections(source?: TrackItem | null): Section[] {
   const { properties, update, updateDetails } = useEditableTrackItem(source);
   if (!properties) return [];
   return [
-    { key: 'speed', node: <Speed value={properties.playbackRate ?? 1} onChange={playbackRate => update({ playbackRate })} /> },
+    {
+      key: 'speed',
+      node: <Speed value={properties.playbackRate ?? 1} onChange={playbackRate => update({ playbackRate })} />,
+    },
     {
       key: 'volume',
       node: (

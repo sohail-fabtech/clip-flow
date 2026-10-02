@@ -1,4 +1,4 @@
-export interface TextMeasureStyle {
+interface TextMeasureStyle {
   fontFamily: string;
   fontSize: string;
   fontWeight: string;

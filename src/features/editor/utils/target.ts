@@ -1,6 +1,6 @@
 type Direction = 'nw' | 'n' | 'ne' | 'w' | 'e' | 'sw' | 's' | 'se';
 
-export interface Ables {
+interface Ables {
   rotatable: boolean;
   resizable: boolean;
   scalable: boolean;
@@ -9,7 +9,7 @@ export interface Ables {
   snappable: boolean;
 }
 
-export interface SelectionInfo {
+interface SelectionInfo {
   targets: HTMLElement[];
   layerType: string | null;
   ables: Ables;
@@ -49,8 +49,7 @@ export const emptySelection: SelectionInfo = {
   controls: [],
 };
 
-export const getTargetById = (id: string) =>
-  document.querySelector<HTMLElement>(`.designcombo-scene-item.id-${id}`);
+export const getTargetById = (id: string) => document.querySelector<HTMLElement>(`.designcombo-scene-item.id-${id}`);
 
 export const getSelectionByIds = (ids: string[]): SelectionInfo => {
   const targets = ids

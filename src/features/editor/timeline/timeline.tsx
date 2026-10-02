@@ -138,12 +138,10 @@ const Timeline = ({ stateManager }: { stateManager: StateManager }) => {
   }, []);
 
   useEffect(() => {
-    const subscription = subject
-      .pipe(filter(({ key }) => key === TIMELINE_BOUNDING_CHANGED))
-      .subscribe(({ value }) => {
-        const bounding = value?.payload?.bounding;
-        if (bounding) setSize({ width: bounding.width, height: bounding.height });
-      });
+    const subscription = subject.pipe(filter(({ key }) => key === TIMELINE_BOUNDING_CHANGED)).subscribe(({ value }) => {
+      const bounding = value?.payload?.bounding;
+      if (bounding) setSize({ width: bounding.width, height: bounding.height });
+    });
     return () => subscription.unsubscribe();
   }, []);
 

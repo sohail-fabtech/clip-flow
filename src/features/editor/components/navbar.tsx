@@ -84,7 +84,10 @@ function Navbar({ stateManager, projectName, setProjectName }: NavbarProps) {
                   <Icons.redo width={20} />
                 </Button>
               </div>
-              <Button onClick={save} className='cursor-pointer rounded bg-white/20 font-normal text-white hover:bg-white/30'>
+              <Button
+                onClick={save}
+                className='cursor-pointer rounded bg-white/20 font-normal text-white hover:bg-white/30'
+              >
                 {saved ? <Check className='h-4 w-4' /> : null}
                 {saved ? 'Saved' : 'Save Changes'}
               </Button>
@@ -143,7 +146,10 @@ const ExportPopover = ({ stateManager }: { stateManager: StateManager }) => {
             ))}
           </PopoverContent>
         </Popover>
-        <Button onClick={handleExport} className='w-full cursor-pointer rounded bg-white font-normal text-black hover:bg-white/90'>
+        <Button
+          onClick={handleExport}
+          className='w-full cursor-pointer rounded bg-white font-normal text-black hover:bg-white/90'
+        >
           Export
         </Button>
       </PopoverContent>

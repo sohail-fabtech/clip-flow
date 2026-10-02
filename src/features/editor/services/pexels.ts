@@ -7,7 +7,7 @@ export interface StockItem {
   details: { src: string; width: number; height: number; duration?: number };
 }
 
-export interface StockPage {
+interface StockPage {
   items: StockItem[];
   page: number;
   hasNextPage: boolean;

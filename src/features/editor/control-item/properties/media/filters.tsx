@@ -7,9 +7,17 @@ type FilterValues = typeof DEFAULTS;
 const FILTERS: { key: string; label: string; values: FilterValues }[] = [
   { key: 'none', label: 'None', values: DEFAULTS },
   { key: 'vivid', label: 'Vivid', values: { ...DEFAULTS, brightness: 105, contrast: 115, saturation: 130 } },
-  { key: 'warm', label: 'Warm', values: { ...DEFAULTS, brightness: 102, contrast: 105, saturation: 115, hue: -10, sepia: 10 } },
+  {
+    key: 'warm',
+    label: 'Warm',
+    values: { ...DEFAULTS, brightness: 102, contrast: 105, saturation: 115, hue: -10, sepia: 10 },
+  },
   { key: 'cool', label: 'Cool', values: { ...DEFAULTS, brightness: 102, contrast: 108, saturation: 110, hue: 15 } },
-  { key: 'vintage', label: 'Vintage', values: { ...DEFAULTS, brightness: 98, contrast: 95, saturation: 80, sepia: 35 } },
+  {
+    key: 'vintage',
+    label: 'Vintage',
+    values: { ...DEFAULTS, brightness: 98, contrast: 95, saturation: 80, sepia: 35 },
+  },
   { key: 'bw', label: 'B&W', values: { ...DEFAULTS, contrast: 110, saturation: 0, grayscale: 100 } },
   { key: 'soft', label: 'Soft', values: { ...DEFAULTS, brightness: 108, contrast: 90, saturation: 95 } },
   { key: 'dramatic', label: 'Dramatic', values: { ...DEFAULTS, brightness: 95, contrast: 120, saturation: 90 } },

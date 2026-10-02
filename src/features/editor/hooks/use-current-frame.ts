@@ -12,5 +12,9 @@ export const useCurrentPlayerFrame = (ref: RefObject<PlayerRef | null> | null) =
     },
     [ref],
   );
-  return useSyncExternalStore(subscribe, () => getSafeCurrentFrame(ref), () => 0);
+  return useSyncExternalStore(
+    subscribe,
+    () => getSafeCurrentFrame(ref),
+    () => 0,
+  );
 };

@@ -4,7 +4,7 @@ import { EDIT_OBJECT } from '@designcombo/state';
 import type { IDesign } from '@designcombo/types';
 import type { CompactFont, FontInfo } from '@/features/editor/types';
 
-export interface FontSource {
+interface FontSource {
   name: string;
   url: string;
 }

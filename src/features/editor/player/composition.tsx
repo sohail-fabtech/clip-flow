@@ -42,23 +42,21 @@ const Composition = () => {
   };
 
   useEffect(() => {
-    const subscription = subject
-      .pipe(filter(({ key }) => key === ENTER_EDIT_MODE))
-      .subscribe(event => {
-        if (editableTextId) {
-          const element = document.querySelector(`[data-text-id="${editableTextId}"]`);
-          if (trackItemIds.includes(editableTextId)) {
-            dispatch(EDIT_OBJECT, {
-              payload: { [editableTextId]: { details: { text: element?.innerHTML ?? '' } } },
-            });
-          } else {
-            dispatch(EDIT_TEMPLATE_ITEM, {
-              payload: { [editableTextId]: { details: { text: element?.textContent ?? '' } } },
-            });
-          }
+    const subscription = subject.pipe(filter(({ key }) => key === ENTER_EDIT_MODE)).subscribe(event => {
+      if (editableTextId) {
+        const element = document.querySelector(`[data-text-id="${editableTextId}"]`);
+        if (trackItemIds.includes(editableTextId)) {
+          dispatch(EDIT_OBJECT, {
+            payload: { [editableTextId]: { details: { text: element?.innerHTML ?? '' } } },
+          });
+        } else {
+          dispatch(EDIT_TEMPLATE_ITEM, {
+            payload: { [editableTextId]: { details: { text: element?.textContent ?? '' } } },
+          });
         }
-        setEditableTextId(event.value?.payload?.id ?? null);
-      });
+      }
+      setEditableTextId(event.value?.payload?.id ?? null);
+    });
     return () => subscription.unsubscribe();
   }, [editableTextId, trackItemIds]);
 

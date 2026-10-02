@@ -4,6 +4,10 @@ import Video from '@/features/editor/timeline/items/video';
 import Audio from '@/features/editor/timeline/items/audio';
 
 class Timeline extends TimelineBase {
+  calcBounding() {
+    if (this.getTrackItems().length > 0) super.calcBounding();
+  }
+
   setViewportPos(posX: number, posY: number) {
     const limitedPos = this.getViewportPos(posX, posY);
     const vt = this.viewportTransform;

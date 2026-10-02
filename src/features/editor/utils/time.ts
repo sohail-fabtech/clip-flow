@@ -9,8 +9,7 @@ const formatSeconds = (totalSeconds: number) => {
   return hours > 0 ? `${hours}:${mmss}` : mmss;
 };
 
-export const frameToTimeString = ({ frame }: { frame: number }, { fps }: { fps: number }) =>
-  formatSeconds(frame / fps);
+export const frameToTimeString = ({ frame }: { frame: number }, { fps }: { fps: number }) => formatSeconds(frame / fps);
 
 export const timeToString = ({ time }: { time: number }) => formatSeconds(time / 1000);
 

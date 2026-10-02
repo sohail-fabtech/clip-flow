@@ -18,7 +18,6 @@ export const Texts = () => {
       payload: { ...TEXT_ADD_PAYLOAD, id: nanoid() },
       options: { size },
     });
-
   };
 
   const handleAddBodyText = () => {
@@ -26,7 +25,6 @@ export const Texts = () => {
       payload: { ...TEXT_BODY_ADD_PAYLOAD, id: nanoid() },
       options: { size },
     });
-
   };
 
   const handleAddCaption = () => {
@@ -60,7 +58,6 @@ export const Texts = () => {
       },
       options: { size },
     });
-
   };
 
   return (

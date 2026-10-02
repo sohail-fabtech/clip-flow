@@ -46,7 +46,9 @@ export function useTextSections(source?: TrackItem | null): Section[] {
     },
     {
       key: 'fontShadow',
-      node: <Shadow label='Font shadow' value={details.boxShadow} onChange={boxShadow => updateDetails({ boxShadow })} />,
+      node: (
+        <Shadow label='Font shadow' value={details.boxShadow} onChange={boxShadow => updateDetails({ boxShadow })} />
+      ),
     },
   ];
 }

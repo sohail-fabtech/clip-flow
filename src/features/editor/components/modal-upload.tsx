@@ -16,7 +16,7 @@ const ACCEPT: Record<MediaKind, string> = {
   video: 'video/*',
 };
 
-export const extractVideoThumbnail = (file: File) =>
+const extractVideoThumbnail = (file: File) =>
   new Promise<string>(resolve => {
     const video = document.createElement('video');
     const src = URL.createObjectURL(file);

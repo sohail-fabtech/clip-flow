@@ -76,8 +76,7 @@ const Header = () => {
   const currentFrame = useCurrentPlayerFrame(playerRef);
 
   const doActiveDelete = () => dispatch(LAYER_DELETE);
-  const doActiveSplit = () =>
-    dispatch(ACTIVE_SPLIT, { payload: {}, options: { time: currentTimeMs(playerRef, fps) } });
+  const doActiveSplit = () => dispatch(ACTIVE_SPLIT, { payload: {}, options: { time: currentTimeMs(playerRef, fps) } });
   const seekTo = (time: number) => dispatch(PLAYER_SEEK, { payload: { time } });
   const changeScale = (scale: ITimelineScaleState) => dispatch(TIMELINE_SCALE_CHANGED, { payload: { scale } });
 

@@ -40,10 +40,18 @@ const MENUS: Record<string, { id: string; label: string }[]> = {
 
 const COLOR_CONTROLS: Record<
   string,
-  { label: string; read: (details: ItemDetails) => string | undefined; write: (color: string, details: ItemDetails) => Partial<ItemDetails> }
+  {
+    label: string;
+    read: (details: ItemDetails) => string | undefined;
+    write: (color: string, details: ItemDetails) => Partial<ItemDetails>;
+  }
 > = {
   color: { label: 'Color', read: d => d.color, write: color => ({ color }) },
-  backgroundColor: { label: 'Background Color', read: d => d.backgroundColor, write: backgroundColor => ({ backgroundColor }) },
+  backgroundColor: {
+    label: 'Background Color',
+    read: d => d.backgroundColor,
+    write: backgroundColor => ({ backgroundColor }),
+  },
   strokeColor: { label: 'Stroke Color', read: d => d.borderColor, write: borderColor => ({ borderColor }) },
   shadowColor: {
     label: 'Shadow Color',

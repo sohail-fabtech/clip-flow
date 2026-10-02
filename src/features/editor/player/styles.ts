@@ -10,7 +10,7 @@ const ratioOf = (aspectRatio?: string) => {
 const shadowOf = ({ boxShadow }: ItemDetails) =>
   boxShadow ? `${boxShadow.x}px ${boxShadow.y}px ${boxShadow.blur}px ${boxShadow.color}` : '';
 
-export const calculateCropStyles = (details: ItemDetails, crop: Crop): CSSProperties => ({
+const calculateCropStyles = (details: ItemDetails, crop: Crop): CSSProperties => ({
   aspectRatio: ratioOf(details.aspectRatio),
   borderRadius: `${Math.min(crop.width, crop.height) * ((details.borderRadius || 0) / 100)}px`,
 });

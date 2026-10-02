@@ -8,9 +8,7 @@ function useZoom(containerRef: RefObject<HTMLElement | null>, size: { width: num
   const recalculateZoom = useCallback(() => {
     const container = containerRef.current;
     if (!container) return;
-    setZoom(
-      Math.min((container.clientWidth - PADDING) / size.width, (container.clientHeight - PADDING) / size.height),
-    );
+    setZoom(Math.min((container.clientWidth - PADDING) / size.width, (container.clientHeight - PADDING) / size.height));
   }, [containerRef, size]);
 
   useEffect(() => {

@@ -141,7 +141,7 @@ export const applyPreset = (preset: TextPreset, trackItem: TrackItem) =>
     },
   });
 
-export const PresetSwatch = ({ preset }: { preset: TextPreset }) => (
+const PresetSwatch = ({ preset }: { preset: TextPreset }) => (
   <div
     style={{
       backgroundColor: preset.backgroundColor,
@@ -187,7 +187,10 @@ export default function TextPresetPicker({ trackItem }: { trackItem: TrackItem }
   useClickOutside(floatingRef, () => setFloatingControl(''));
 
   return (
-    <div ref={floatingRef} className='absolute right-2 top-2 z-[200] w-56 rounded border-none bg-[#27272A] p-0 text-white'>
+    <div
+      ref={floatingRef}
+      className='absolute right-2 top-2 z-[200] w-56 rounded border-none bg-[#27272A] p-0 text-white'
+    >
       <div className='flex items-center justify-between px-4 py-3'>
         <p className='text-sm font-bold'>Presets</p>
         <button type='button' onClick={() => setFloatingControl('')} aria-label='Close'>

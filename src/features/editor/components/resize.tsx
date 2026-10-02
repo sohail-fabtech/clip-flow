@@ -6,7 +6,12 @@ import { Hint } from '@/components/ui/hint';
 import { Icons } from '@/components/shared/icons';
 
 const RESIZE_OPTIONS = [
-  { label: '16:9', Icon: Icons.landscape, description: 'YouTube ads', value: { width: 1920, height: 1080, name: '16:9' } },
+  {
+    label: '16:9',
+    Icon: Icons.landscape,
+    description: 'YouTube ads',
+    value: { width: 1920, height: 1080, name: '16:9' },
+  },
   {
     label: '9:16',
     Icon: Icons.portrait,

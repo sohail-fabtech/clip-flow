@@ -3,6 +3,7 @@ import { mkdir } from 'node:fs/promises';
 import { nanoid } from 'nanoid';
 import type { IDesign } from '@designcombo/types';
 import { publicUrl, resolveKey } from '@/server/storage';
+import { COMPOSITION_ID } from '@/features/editor/remotion/constants';
 
 export interface RenderJob {
   id: string;
@@ -47,7 +48,7 @@ async function run(job: RenderJob, design: IDesign) {
     const { renderMedia, selectComposition } = await import('@remotion/renderer');
     const serveUrl = await bundleOnce();
     const inputProps = { design };
-    const composition = await selectComposition({ serveUrl, id: 'editor', inputProps });
+    const composition = await selectComposition({ serveUrl, id: COMPOSITION_ID, inputProps });
     const key = `renders/${job.id}.mp4`;
     const outputLocation = resolveKey(key);
     await mkdir(path.dirname(outputLocation), { recursive: true });

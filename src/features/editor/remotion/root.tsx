@@ -3,9 +3,8 @@ import { Composition as RemotionComposition, continueRender, delayRender } from 
 import type { IDesign } from '@designcombo/types';
 import Composition from '@/features/editor/player/composition';
 import useStore from '@/features/editor/stores/use-store';
+import { COMPOSITION_ID } from '@/features/editor/remotion/constants';
 import { fontsOfDesign, loadFonts } from '@/features/editor/utils/fonts';
-
-export const COMPOSITION_ID = 'editor';
 
 interface RenderProps extends Record<string, unknown> {
   design: IDesign;

@@ -3,7 +3,7 @@ import { ColorField } from '@/features/editor/control-item/common/color-field';
 import { NumberField } from '@/features/editor/control-item/common/number-field';
 import type { BoxShadow } from '@/features/editor/types';
 
-export const NO_SHADOW: BoxShadow = { color: 'transparent', x: 0, y: 0, blur: 0 };
+const NO_SHADOW: BoxShadow = { color: 'transparent', x: 0, y: 0, blur: 0 };
 
 interface ShadowProps {
   label: string;

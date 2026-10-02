@@ -2,7 +2,8 @@ import { extensionOf, isMediaType, publicUrl, saveFile, storageKey } from '@/ser
 
 const MAX_REMOTE_BYTES = 500 * 1024 * 1024;
 // ponytail: hostname check only, no DNS-rebinding protection; resolve + pin the IP if exposed publicly
-const PRIVATE_HOST = /^(localhost|0\.0\.0\.0|127\.|10\.|192\.168\.|169\.254\.|172\.(1[6-9]|2\d|3[01])\.|\[?::1\]?$|\[?f[cd])/i;
+const PRIVATE_HOST =
+  /^(localhost|0\.0\.0\.0|127\.|10\.|192\.168\.|169\.254\.|172\.(1[6-9]|2\d|3[01])\.|\[?::1\]?$|\[?f[cd])/i;
 
 async function importUrl(originalUrl: string) {
   const url = new URL(originalUrl);

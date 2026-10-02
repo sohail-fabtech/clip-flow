@@ -1,36 +1,32 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Video Editor
 
-## Getting Started
+Browser-based video editor (Next.js 16, React 19, TypeScript) built on designcombo state/timeline and Remotion.
 
-First, run the development server:
+## Setup
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm install
+cp .env.example .env.local   # fill in keys
+npm run dev                  # http://localhost:3000
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+| Variable             | Used for                          |
+| -------------------- | --------------------------------- |
+| `PEXELS_API_KEY`     | Stock Library (images and videos) |
+| `ELEVENLABS_API_KEY` | AI Hook voice-over (optional)     |
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Scripts
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- `npm run dev` / `npm run build` / `npm start`
+- `npm run typecheck`
+- `npm run format`
 
-## Learn More
+## How it works
 
-To learn more about Next.js, take a look at the following resources:
+- **Editing**: `src/features/editor` — player (Remotion), scene interactions, canvas timeline, side panels, property panels.
+- **Uploads**: files are stored on local disk in `./storage` and served by `/api/files/*` (supports Range requests).
+- **Export**: MP4 is rendered server-side with Remotion (`/api/render`). The first render downloads a headless Chrome
+  and bundles the composition, so it takes longer. JSON export downloads the design directly.
+- **Save**: "Save Changes" stores the project in `localStorage` and it is restored on the next visit.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Rendering needs a long-running Node server (`npm start`); it does not run on serverless hosts.

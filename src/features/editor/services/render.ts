@@ -1,14 +1,5 @@
 import type { IDesign } from '@designcombo/types';
-
-export type RenderStatus = 'PENDING' | 'COMPLETED' | 'FAILED';
-
-export interface RenderJob {
-  id: string;
-  status: RenderStatus;
-  progress: number;
-  url?: string;
-  error?: string;
-}
+import type { RenderJob } from '@/server/render-jobs';
 
 async function request<T>(input: string, init?: RequestInit): Promise<T> {
   const response = await fetch(input, init);

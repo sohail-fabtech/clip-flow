@@ -1,6 +1,6 @@
 import { useCallback, useSyncExternalStore } from 'react';
 
-export function useMediaQuery(query: string) {
+function useMediaQuery(query: string) {
   const subscribe = useCallback(
     (onChange: () => void) => {
       const media = window.matchMedia(query);

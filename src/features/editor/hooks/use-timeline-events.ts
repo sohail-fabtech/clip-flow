@@ -41,11 +41,9 @@ const useTimelineEvents = () => {
   }, [playerRef, fps]);
 
   useEffect(() => {
-    const subscription = subject
-      .pipe(filter(({ key }) => key.startsWith(LAYER_PREFIX)))
-      .subscribe(({ key, value }) => {
-        if (key === LAYER_SELECTION) setState({ activeIds: value?.payload?.activeIds ?? [] });
-      });
+    const subscription = subject.pipe(filter(({ key }) => key.startsWith(LAYER_PREFIX))).subscribe(({ key, value }) => {
+      if (key === LAYER_SELECTION) setState({ activeIds: value?.payload?.activeIds ?? [] });
+    });
     return () => subscription.unsubscribe();
   }, [setState]);
 };

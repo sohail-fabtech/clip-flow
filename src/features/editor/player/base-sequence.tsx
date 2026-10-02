@@ -5,7 +5,7 @@ import { calculateFrames } from '@/features/editor/utils/frames';
 import { calculateContainerStyles } from '@/features/editor/player/styles';
 import type { ItemDetails } from '@/features/editor/types';
 
-export interface SequenceItemOptions {
+interface SequenceItemOptions {
   fps: number;
   frame: number;
   size: { width: number; height: number };

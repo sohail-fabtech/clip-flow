@@ -17,12 +17,16 @@ export async function POST(request: Request) {
 
   const { voiceId, text } = (await request.json()) as { voiceId?: string; text?: string };
   if (!voiceId || !text?.trim()) return Response.json({ error: 'voiceId and text are required' }, { status: 400 });
-  if (text.length > MAX_CHARS) return Response.json({ error: `Text is limited to ${MAX_CHARS} characters` }, { status: 400 });
+  if (text.length > MAX_CHARS)
+    return Response.json({ error: `Text is limited to ${MAX_CHARS} characters` }, { status: 400 });
 
   try {
     const elevenLabsVoiceId = await findVoiceId(voiceId, apiKey);
     if (!elevenLabsVoiceId) {
-      return Response.json({ error: `Voice "${voiceId}" is not available on this ElevenLabs account` }, { status: 400 });
+      return Response.json(
+        { error: `Voice "${voiceId}" is not available on this ElevenLabs account` },
+        { status: 400 },
+      );
     }
 
     const response = await fetch(`${API}/text-to-speech/${elevenLabsVoiceId}`, {
