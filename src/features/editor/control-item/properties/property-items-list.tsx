@@ -4,15 +4,14 @@ import usePropertiesStore from '@/features/editor/stores/use-property-store';
 import BasicText from '@/features/editor/control-item/properties/text-properties/basic';
 import PresetsText from '@/features/editor/control-item/properties/text-properties/presets';
 import SmartToolsText from '@/features/editor/control-item/properties/text-properties/smart-tools';
-import BasicAudio from '@/features/editor/control-item/properties/audio-properties/basic';
-import BasicImage from '@/features/editor/control-item/properties/image-properties/basic';
-import ColorsImage from '@/features/editor/control-item/properties/image-properties/colors';
-import CropImage from '@/features/editor/control-item/properties/image-properties/crop';
-import FiltersImage from '@/features/editor/control-item/properties/image-properties/filters';
-import BasicVideo from '@/features/editor/control-item/properties/video-properties/basic';
-import ColorsVideo from '@/features/editor/control-item/properties/video-properties/colors';
-import CropVideo from '@/features/editor/control-item/properties/video-properties/crop';
-import FiltersVideo from '@/features/editor/control-item/properties/video-properties/filters';
+import { DesktopSections, useAudioSections, useMediaSections } from '@/features/editor/control-item/media-sections';
+import Colors from '@/features/editor/control-item/properties/media/colors';
+import Crop from '@/features/editor/control-item/properties/media/crop';
+import Filters from '@/features/editor/control-item/properties/media/filters';
+
+const BasicImage = () => <DesktopSections sections={useMediaSections('image').filter(s => s.key !== 'crop')} />;
+const BasicAudio = () => <DesktopSections title='Basic' sections={useAudioSections().reverse()} />;
+const BasicVideo = () => <DesktopSections sections={useMediaSections('video').filter(s => s.key !== 'crop')} />;
 
 const PROPERTY_COMPONENTS: Record<string, ComponentType> = {
   'text-basic': BasicText,
@@ -20,13 +19,13 @@ const PROPERTY_COMPONENTS: Record<string, ComponentType> = {
   'text-smart': SmartToolsText,
   'audio-basic': BasicAudio,
   'image-basic': BasicImage,
-  'image-color': ColorsImage,
-  'image-crop': CropImage,
-  'image-filter': FiltersImage,
+  'image-color': Colors,
+  'image-crop': Crop,
+  'image-filter': Filters,
   'video-basic': BasicVideo,
-  'video-color': ColorsVideo,
-  'video-crop': CropVideo,
-  'video-filter': FiltersVideo,
+  'video-color': Colors,
+  'video-crop': Crop,
+  'video-filter': Filters,
 };
 
 export default function PropertiesItemsList() {

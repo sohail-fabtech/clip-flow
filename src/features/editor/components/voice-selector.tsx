@@ -1,245 +1,133 @@
-import React, { useState, useRef, useEffect, useMemo, useCallback, memo } from 'react';
-import { ChevronDown, Play, Pause, Check } from 'lucide-react';
+import { useEffect, useRef, useState, type MouseEvent } from 'react';
+import { Check, ChevronDown, Pause, Play } from 'lucide-react';
 import { VOICE_DATA } from '@/features/editor/data/voice-data';
 
-export function VoiceSelector({ selectedVoice, onVoiceSelect }) {
-  // Configurable UI values to avoid hardcoding
-  const DROPDOWN_Z_INDEX = 9999;
-  const DROPDOWN_MAX_HEIGHT_PX = 256; // Tailwind max-h-64
-  const DROPDOWN_SCROLL_MAX_HEIGHT_PX = 192; // Tailwind max-h-48
-  const DROPDOWN_MIN_WIDTH_PX = 250; // Tailwind min-w-[250px]
+interface VoiceSelectorProps {
+  selectedVoice: string;
+  onVoiceSelect: (voiceId: string) => void;
+}
 
-  // Reused className fragments (keeping existing CSS intact)
-  const DROPDOWN_CONTAINER_CLS = `absolute top-full left-0 right-0 z-[${DROPDOWN_Z_INDEX}] bg-[#27272A] border border-[#3F3F46] rounded-md shadow-lg max-h-64 overflow-hidden min-w-[${DROPDOWN_MIN_WIDTH_PX}px] mt-1`;
-  const DROPDOWN_SCROLL_CLS = 'max-h-48 overflow-y-auto scrollbar-hide';
-  const ITEM_BASE_CLS = 'flex items-center gap-3 px-3 py-2 cursor-pointer hover:bg-[#3F3F46] transition-colors';
-  const ITEM_ACTIVE_BG_CLS = 'bg-[#3F3F46]';
-
+export function VoiceSelector({ selectedVoice, onVoiceSelect }: VoiceSelectorProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [highlightedIndex, setHighlightedIndex] = useState(0);
-  const dropdownRef = useRef(null);
-  const audioRef = useRef(null);
-  const [isPlaying, setIsPlaying] = useState(false);
-  const [playingUrl, setPlayingUrl] = useState(null);
+  const [highlighted, setHighlighted] = useState(0);
+  const [playingUrl, setPlayingUrl] = useState<string | null>(null);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const selected = VOICE_DATA.find(voice => voice.id === selectedVoice) ?? VOICE_DATA[0];
 
-  const voices = VOICE_DATA; // alias for readability
-  const voicesLength = voices.length;
+  const select = (voiceId: string) => {
+    onVoiceSelect(voiceId);
+    setIsOpen(false);
+    setHighlighted(0);
+  };
 
-  const handleVoiceSelect = useCallback(
-    voiceId => {
-      onVoiceSelect(voiceId);
-      setIsOpen(false);
-      setHighlightedIndex(0);
-    },
-    [onVoiceSelect],
-  );
-
-  const toggleDropdown = useCallback(() => {
-    setIsOpen(prev => !prev);
-  }, []);
-
-  // Close dropdown when clicking outside
   useEffect(() => {
-    const handleClickOutside = event => {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
-        setIsOpen(false);
-        setHighlightedIndex(0);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
+    const audio = new Audio();
+    const onEnded = () => setPlayingUrl(null);
+    audio.addEventListener('ended', onEnded);
+    audioRef.current = audio;
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
-
-  // Keyboard navigation
-  useEffect(() => {
-    const handleKeyDown = event => {
-      if (!isOpen) return;
-
-      switch (event.key) {
-        case 'ArrowDown':
-          event.preventDefault();
-          setHighlightedIndex(prev => (prev < voicesLength - 1 ? prev + 1 : 0));
-          break;
-        case 'ArrowUp':
-          event.preventDefault();
-          setHighlightedIndex(prev => (prev > 0 ? prev - 1 : voicesLength - 1));
-          break;
-        case 'Enter':
-          event.preventDefault();
-          if (highlightedIndex >= 0 && highlightedIndex < voicesLength) {
-            handleVoiceSelect(voices[highlightedIndex].id);
-          }
-          break;
-        case 'Escape':
-          setIsOpen(false);
-          setHighlightedIndex(0);
-          break;
-      }
-    };
-
-    document.addEventListener('keydown', handleKeyDown);
-    return () => document.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, highlightedIndex, voices, voicesLength, handleVoiceSelect]);
-
-  const selectedVoiceData = useMemo(() => {
-    return voices.find(v => v.id === selectedVoice) || voices[0];
-  }, [voices, selectedVoice]);
-
-  const stopCurrentAudio = useCallback(() => {
-    if (audioRef.current) {
-      audioRef.current.pause();
-      audioRef.current.currentTime = 0;
-    }
-    setIsPlaying(false);
-    setPlayingUrl(null);
-  }, []);
-
-  useEffect(() => {
-    // Create a single reusable Audio instance
-    audioRef.current = new Audio();
-    const handleEnded = () => {
-      setIsPlaying(false);
-      setPlayingUrl(null);
-    };
-    audioRef.current.addEventListener('ended', handleEnded);
-    return () => {
-      if (!audioRef.current) return;
-      audioRef.current.pause();
-      audioRef.current.removeEventListener('ended', handleEnded);
-      audioRef.current.src = '';
+      audio.pause();
+      audio.removeEventListener('ended', onEnded);
       audioRef.current = null;
     };
   }, []);
 
-  const handlePreview = useCallback(
-    async (voiceUrl, event) => {
-      if (event) event.stopPropagation();
-      try {
-        const audio = audioRef.current;
-        if (!audio) return;
+  useEffect(() => {
+    const onPointerDown = (event: PointerEvent) => {
+      if (!dropdownRef.current?.contains(event.target as Node)) setIsOpen(false);
+    };
+    document.addEventListener('pointerdown', onPointerDown);
+    return () => document.removeEventListener('pointerdown', onPointerDown);
+  }, []);
 
-        if (playingUrl === voiceUrl) {
-          if (isPlaying) {
-            audio.pause();
-            setIsPlaying(false);
-          } else {
-            await audio.play();
-            setIsPlaying(true);
-          }
-          return;
-        }
+  useEffect(() => {
+    if (!isOpen) return;
+    const onKeyDown = (event: KeyboardEvent) => {
+      const count = VOICE_DATA.length;
+      if (event.key === 'ArrowDown') setHighlighted(i => (i + 1) % count);
+      else if (event.key === 'ArrowUp') setHighlighted(i => (i - 1 + count) % count);
+      else if (event.key === 'Enter') select(VOICE_DATA[highlighted].id);
+      else if (event.key === 'Escape') setIsOpen(false);
+      else return;
+      event.preventDefault();
+    };
+    document.addEventListener('keydown', onKeyDown);
+    return () => document.removeEventListener('keydown', onKeyDown);
+  }, [isOpen, highlighted]);
 
-        stopCurrentAudio();
-        audio.src = voiceUrl;
-        setPlayingUrl(voiceUrl);
-        await audio.play();
-        setIsPlaying(true);
-      } catch (error) {
-        // Fail gracefully on preview errors
-        stopCurrentAudio();
-      }
-    },
-    [isPlaying, playingUrl, stopCurrentAudio],
-  );
-
-  const handleMouseEnter = useCallback(index => setHighlightedIndex(index), []);
-  const handleMouseLeave = useCallback(() => setHighlightedIndex(0), []);
-
-  // List Item component
-  const ListItem = memo(
-    ({
-      voice,
-      index,
-      isHighlighted,
-      isSelected,
-      isPlaying,
-      playingUrl,
-      onSelect,
-      onHover,
-      onMouseLeave,
-      onPreview,
-    }) => {
-      const activeCls = isHighlighted ? ITEM_ACTIVE_BG_CLS : '';
-      return (
-        <div
-          key={voice.id}
-          onClick={() => onSelect(voice.id)}
-          onMouseEnter={() => onHover(index)}
-          onMouseLeave={onMouseLeave}
-          className={`${ITEM_BASE_CLS} ${activeCls}`}
-          role='option'
-          aria-selected={isSelected}
-        >
-          <div className='rounded-full flex items-center justify-center cursor-pointer bg:white/20 bg-white/20 p-1.5'>
-            {playingUrl === voice.previewUrl && isPlaying ? (
-              <Pause className='w-3 h-3 text-white ml-0.5' onClick={e => onPreview(voice.previewUrl, e)} />
-            ) : (
-              <Play className='w-3 h-3 text-white ml-0.5' onClick={e => onPreview(voice.previewUrl, e)} />
-            )}
-          </div>
-
-          <div className='flex-1 min-w-0'>
-            <div className='text-sm font-medium text-white'>{voice.name}</div>
-            <div className='text-xs text-gray-300'>{voice.description}</div>
-          </div>
-
-          <div className='flex items-center gap-2'>
-            {isSelected && <Check className='w-4 h-4 text-white flex-shrink-0' />}
-          </div>
-        </div>
-      );
-    },
-  );
+  const preview = async (url: string, event: MouseEvent) => {
+    event.stopPropagation();
+    const audio = audioRef.current;
+    if (!audio) return;
+    if (playingUrl === url) {
+      audio.pause();
+      setPlayingUrl(null);
+      return;
+    }
+    audio.src = url;
+    setPlayingUrl(url);
+    await audio.play().catch(() => setPlayingUrl(null));
+  };
 
   return (
     <div className='relative' ref={dropdownRef}>
-      {/* Voice Selection Header */}
-      <div className='flex flex-col gap-2 mb-3'>
+      <div className='mb-3 flex flex-col gap-2'>
         <p className='text-sm text-white'>Speaker voice</p>
-
-        {/* Current Selection Button */}
         <button
-          onClick={toggleDropdown}
-          className='flex items-center justify-between w-full px-3 py-2 bg-[#3F3F46] hover:bg-[#52525B] rounded-md transition-colors'
+          type='button'
+          onClick={() => setIsOpen(open => !open)}
+          className='flex w-full items-center justify-between rounded-md bg-[#3F3F46] px-3 py-2 transition-colors hover:bg-[#52525B]'
           aria-haspopup='listbox'
           aria-expanded={isOpen}
         >
-          <div className='flex items-center gap-2'>
-            <div className='w-6 h-6 rounded-full bg-white/20 flex items-center justify-center'>
-              <Play className='w-3 h-3 text-white ml-0.5' />
-            </div>
-            <span className='text-white text-sm font-medium'>{selectedVoiceData.name}</span>
-          </div>
-          <ChevronDown className={`w-4 h-4 text-white transition-transform ${isOpen ? 'rotate-180' : ''}`} />
+          <span className='flex items-center gap-2'>
+            <span className='flex h-6 w-6 items-center justify-center rounded-full bg-white/20'>
+              <Play className='ml-0.5 h-3 w-3 text-white' />
+            </span>
+            <span className='text-sm font-medium text-white'>{selected.name}</span>
+          </span>
+          <ChevronDown className={`h-4 w-4 text-white transition-transform ${isOpen ? 'rotate-180' : ''}`} />
         </button>
       </div>
 
-      {/* Voice Library */}
       {isOpen && (
         <div
-          className={DROPDOWN_CONTAINER_CLS}
           role='listbox'
-          aria-activedescendant={voices[highlightedIndex]?.id}
-          style={{ maxHeight: DROPDOWN_MAX_HEIGHT_PX, minWidth: DROPDOWN_MIN_WIDTH_PX }}
+          aria-activedescendant={VOICE_DATA[highlighted]?.id}
+          className='absolute left-0 right-0 top-full z-[9999] mt-1 min-w-[250px] overflow-hidden rounded-md border border-[#3F3F46] bg-[#27272A] shadow-lg'
         >
-          <div className={DROPDOWN_SCROLL_CLS} style={{ maxHeight: DROPDOWN_SCROLL_MAX_HEIGHT_PX }}>
-            {voices.map((voice, index) => (
-              <ListItem
+          <div className='scrollbar-hide max-h-48 overflow-y-auto'>
+            {VOICE_DATA.map((voice, index) => (
+              <div
                 key={voice.id}
-                voice={voice}
-                index={index}
-                isHighlighted={highlightedIndex === index}
-                isSelected={selectedVoice === voice.id}
-                isPlaying={isPlaying}
-                playingUrl={playingUrl}
-                onSelect={handleVoiceSelect}
-                onHover={handleMouseEnter}
-                onMouseLeave={handleMouseLeave}
-                onPreview={handlePreview}
-              />
+                id={voice.id}
+                role='option'
+                aria-selected={selectedVoice === voice.id}
+                onClick={() => select(voice.id)}
+                onMouseEnter={() => setHighlighted(index)}
+                className={`flex cursor-pointer items-center gap-3 px-3 py-2 transition-colors hover:bg-[#3F3F46] ${
+                  highlighted === index ? 'bg-[#3F3F46]' : ''
+                }`}
+              >
+                <button
+                  type='button'
+                  aria-label={`Preview ${voice.name}`}
+                  onClick={event => preview(voice.previewUrl, event)}
+                  className='flex items-center justify-center rounded-full bg-white/20 p-1.5'
+                >
+                  {playingUrl === voice.previewUrl ? (
+                    <Pause className='ml-0.5 h-3 w-3 text-white' />
+                  ) : (
+                    <Play className='ml-0.5 h-3 w-3 text-white' />
+                  )}
+                </button>
+                <div className='min-w-0 flex-1'>
+                  <div className='text-sm font-medium text-white'>{voice.name}</div>
+                  <div className='text-xs text-gray-300'>{voice.description}</div>
+                </div>
+                {selectedVoice === voice.id && <Check className='h-4 w-4 flex-shrink-0 text-white' />}
+              </div>
             ))}
           </div>
         </div>

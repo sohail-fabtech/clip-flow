@@ -1,24 +1,31 @@
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { usePointerDrag } from '@/features/editor/hooks/use-pointer-drag';
 import useCropStore from '@/features/editor/stores/use-crop-store';
 import { clamp } from '@/features/editor/utils/math';
+import type { ItemDetails } from '@/features/editor/types';
 
 const MIN_CROP_SIZE = 100;
+const FRAME_TIME = 1000 / 30;
+const HANDLE_DIRECTIONS = ['nw', 'n', 'ne', 'e', 'se', 's', 'sw', 'w'];
 
-const handleDirections = ['nw', 'n', 'ne', 'e', 'se', 's', 'sw', 'w'];
+type Area = [number, number, number, number];
 
-export const ElementCrop = ({ element, size, targetDetails }) => {
+interface ElementCropProps {
+  element: HTMLImageElement | HTMLVideoElement;
+  size: { width: number; height: number };
+  targetDetails: ItemDetails;
+}
+
+export const ElementCrop = ({ element, size, targetDetails }: ElementCropProps) => {
   const { area, setArea, scale } = useCropStore();
-  const canvasPreviewRef = useRef(null);
+  const canvasPreviewRef = useRef<HTMLCanvasElement>(null);
 
-  const { dragProps, isDragging } = usePointerDrag({
-    preventDefault: true,
-    stopPropagation: true,
-    onMove: ({ x, y, deltaX, deltaY, state: { dirX, dirY, area } }) => {
+  const { dragProps, isDragging } = usePointerDrag<{ dirX: number; dirY: number; area: Area }>(
+    ({ x, y, deltaX, deltaY, state: { dirX, dirY, area } }) => {
       const rect = canvasPreviewRef.current?.getBoundingClientRect();
       if (!rect) return;
 
-      const newArea = [...area];
+      const newArea: Area = [...area];
 
       if (dirX === 0 && dirY === 0) {
         newArea[0] = clamp(area[0] + deltaX / (rect.width / (size.width * scale)), 0, size.width * scale - area[2]);
@@ -47,81 +54,55 @@ export const ElementCrop = ({ element, size, targetDetails }) => {
 
       setArea(newArea);
     },
-  });
+  );
 
   useEffect(() => {
-    let updating = true;
-
+    let frame = 0;
     const canvas = canvasPreviewRef.current;
     const context = canvas?.getContext('2d');
-
-    const CANVAS_FRAME_TIME = 1000 / 30;
     let time = Date.now();
 
     const update = () => {
-      if (!updating) {
-        return;
-      }
-
       const now = Date.now();
-      let shouldDraw = true;
-      // if element is instace of HTMLVideoElement
-      if (element instanceof HTMLVideoElement) {
-        shouldDraw = now - time > CANVAS_FRAME_TIME && element.readyState === 4;
-      }
+      const shouldDraw =
+        !(element instanceof HTMLVideoElement) || (now - time > FRAME_TIME && element.readyState === 4);
 
       if (canvas && context && shouldDraw) {
         time = now;
         context.reset();
-        context.clearRect(0, 0, canvas.width, canvas.height);
-
-        // const area = transform.area!;
-        const area = useCropStore.getState().area;
-
-        if (!area) {
-          context.drawImage(element, 0, 0, canvas.width, canvas.height);
-        } else {
-          context.filter = 'brightness(0.25)';
-          context.drawImage(element, 0, 0, canvas.width, canvas.height);
-
-          const x = area[0] * ((size.width * scale) / canvas.width);
-          const y = area[1] * ((size.height * scale) / canvas.height);
-          const w = area[2] * ((size.width * scale) / canvas.width);
-          const h = area[3] * ((size.height * scale) / canvas.height);
-
-          context.filter = 'none';
-
-          context.drawImage(element, x / scale, y / scale, w / scale, h / scale, x, y, w, h);
-        }
+        const { area } = useCropStore.getState();
+        context.filter = 'brightness(0.25)';
+        context.drawImage(element, 0, 0, canvas.width, canvas.height);
+        const x = area[0] * ((size.width * scale) / canvas.width);
+        const y = area[1] * ((size.height * scale) / canvas.height);
+        const w = area[2] * ((size.width * scale) / canvas.width);
+        const h = area[3] * ((size.height * scale) / canvas.height);
+        context.filter = 'none';
+        context.drawImage(element, x / scale, y / scale, w / scale, h / scale, x, y, w, h);
       }
-      requestAnimationFrame(update);
+      frame = requestAnimationFrame(update);
     };
-    const widthTotal = area[2];
-    const scaleWidth = targetDetails.width / widthTotal;
-    const areaPosX = (targetDetails.crop?.x || 0) / scaleWidth;
-    const areaPosY = (targetDetails.crop?.y || 0) / scaleWidth;
-    const areaWidth = (targetDetails.crop?.width || targetDetails.width) / scaleWidth;
-    const areaHeight = (targetDetails.crop?.height || targetDetails.height) / scaleWidth;
-    setArea([areaPosX, areaPosY, areaWidth, areaHeight]);
 
-    requestAnimationFrame(update);
+    const width = targetDetails.width ?? 0;
+    const ratio = width / area[2];
+    const crop = targetDetails.crop;
+    setArea([
+      (crop?.x ?? 0) / ratio,
+      (crop?.y ?? 0) / ratio,
+      (crop?.width ?? width) / ratio,
+      (crop?.height ?? targetDetails.height ?? 0) / ratio,
+    ]);
 
-    return () => {
-      updating = false;
-    };
+    frame = requestAnimationFrame(update);
+    return () => cancelAnimationFrame(frame);
   }, [element]);
 
   return (
     <div className='flex'>
-      <div className={'crop'}>
-        <canvas
-          width={size.width * scale}
-          height={size.height * scale}
-          className={'videoPreview'}
-          ref={canvasPreviewRef}
-        />
+      <div className='crop'>
+        <canvas width={size.width * scale} height={size.height * scale} ref={canvasPreviewRef} />
         <div
-          className={'box'}
+          className='box'
           style={{
             left: `${(area[0] / (size.width * scale)) * 100}%`,
             top: `${(area[1] / (size.height * scale)) * 100}%`,
@@ -166,8 +147,8 @@ export const ElementCrop = ({ element, size, targetDetails }) => {
               }}
             />
           </svg>
-          <div className={'handles'}>
-            {handleDirections.map(direction => (
+          <div className='handles'>
+            {HANDLE_DIRECTIONS.map(direction => (
               <div
                 key={direction}
                 className={`handle-${direction}`}
