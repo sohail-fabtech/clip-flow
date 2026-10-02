@@ -226,7 +226,7 @@ export const Elements = () => {
           <ScrollArea className='flex-1 h-[calc(100%-98px)] max-w-full'>
             <div className='flex flex-col space-y-4'>
               <div className='px-4'>
-                <HorizontalScroll className='w-full' debug={true}>
+                <HorizontalScroll className='w-full'>
                   <div className='flex gap-2 pb-2 min-w-max'>
                     <Button
                       type='button'
@@ -502,7 +502,7 @@ const AllVisualizers = ({ handleAllClick, type }) => {
       {type.all === 'all' && (
         <>
           <div className='px-4'>
-            <HorizontalScroll className='w-full' debug={false}>
+            <HorizontalScroll className='w-full'>
               <div className='flex gap-2 pb-2 min-w-max'>
                 <button
                   type='button'

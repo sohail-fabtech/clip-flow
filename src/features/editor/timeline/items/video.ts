@@ -1,24 +1,46 @@
-import { Control, Pattern, Trimmable, timeMsToUnits, unitsToTimeMs } from '@designcombo/timeline';
+import { Pattern, Trimmable, timeMsToUnits, unitsToTimeMs, type TrimmableProps } from '@designcombo/timeline';
+import type { MP4Clip } from '@designcombo/frames';
 import ThumbnailCache from '@/features/editor/utils/thumbnail-cache';
 import { calculateOffscreenSegments, calculateThumbnailSegmentLayout } from '@/features/editor/utils/filmstrip';
-import { getFileFromUrl } from '@/features/editor/utils/file';
 import { SECONDARY_FONT } from '@/features/editor/constants/constants';
 
-const EMPTY_FILMSTRIP = {
-  offset: 0,
-  startTime: 0,
-  thumbnailsCount: 0,
-  widthOnScreen: 0,
-};
+interface Filmstrip {
+  offset: number;
+  startTime: number;
+  thumbnailsCount: number;
+  widthOnScreen: number;
+  segmentIndex?: number;
+}
+
+type VideoProps = TrimmableProps<{
+  duration: number;
+  src: string;
+  aspectRatio: number;
+  metadata: { previewUrl?: string };
+}>;
+
+const EMPTY_FILMSTRIP: Filmstrip = { offset: 0, startTime: 0, thumbnailsCount: 0, widthOnScreen: 0 };
+
+const withCacheBuster = (url: string) =>
+  /^(data|blob):/.test(url) ? url : `${url}${url.includes('?') ? '&' : '?'}t=${Date.now()}`;
+
+const loadImage = (src: string, crossOrigin = false) =>
+  new Promise<HTMLImageElement | null>(resolve => {
+    const img = new Image();
+    if (crossOrigin) img.crossOrigin = 'anonymous';
+    img.onload = () => resolve(img);
+    img.onerror = () => resolve(null);
+    img.src = src;
+  });
 
 class Video extends Trimmable {
   static type = 'Video';
-  clip;
-  resourceId = '';
-  isSelected = false;
+  clip: MP4Clip | null = null;
   hasSrc = true;
-  prevDuration;
+  prevDuration = 0;
   itemType = 'video';
+  playbackRate = 1;
+  declare metadata: VideoProps['metadata'];
 
   aspectRatio = 1;
   scrollLeft = 0;
@@ -28,22 +50,21 @@ class Video extends Trimmable {
   offscreenSegments = 0;
   thumbnailWidth = 0;
   thumbnailHeight = 40;
-  thumbnailsList = [];
   isFetchingThumbnails = false;
   thumbnailCache = new ThumbnailCache();
 
-  currentFilmstrip = EMPTY_FILMSTRIP;
-  nextFilmstrip = { ...EMPTY_FILMSTRIP, segmentIndex: 0 };
-  loadingFilmstrip = EMPTY_FILMSTRIP;
+  currentFilmstrip: Filmstrip = EMPTY_FILMSTRIP;
+  nextFilmstrip: Filmstrip = { ...EMPTY_FILMSTRIP, segmentIndex: 0 };
+  loadingFilmstrip: Filmstrip = EMPTY_FILMSTRIP;
 
-  offscreenCanvas = null;
-  offscreenCtx = null;
+  offscreenCanvas: OffscreenCanvas | null = null;
+  offscreenCtx: OffscreenCanvasRenderingContext2D | null = null;
   isDirty = true;
   fallbackSegmentIndex = 0;
   fallbackSegmentsCount = 0;
   previewUrl = '';
 
-  constructor(props) {
+  constructor(props: VideoProps) {
     super(props);
     this.id = props.id;
     this.tScale = props.tScale;
@@ -62,14 +83,14 @@ class Video extends Trimmable {
     this.strokeWidth = 0;
     this.transparentCorners = false;
     this.hasBorders = false;
-    this.previewUrl = props.metadata.previewUrl;
+    this.previewUrl = props.metadata.previewUrl ?? '';
     this.initOffscreenCanvas();
     this.initialize();
   }
 
   initOffscreenCanvas() {
     if (!this.offscreenCanvas) {
-      this.offscreenCanvas = new OffscreenCanvas(this.width, this.height);
+      this.offscreenCanvas = new OffscreenCanvas(Math.max(1, this.width), Math.max(1, this.height));
       this.offscreenCtx = this.offscreenCanvas.getContext('2d');
     }
     if (this.offscreenCanvas.width !== this.width || this.offscreenCanvas.height !== this.height) {
@@ -97,22 +118,17 @@ class Video extends Trimmable {
   }
 
   async prepareAssets() {
-    const file = await getFileFromUrl(this.src);
-    const stream = file.stream();
-    if (typeof window !== 'undefined') {
-      try {
-        const { MP4Clip } = await import('@designcombo/frames');
-        this.clip = new MP4Clip(stream);
-      } catch (error) {
-        console.warn('Failed to load MP4Clip:', error);
-        this.clip = null;
-      }
-    } else {
+    try {
+      const response = await fetch(this.src);
+      if (!response.ok || !response.body) throw new Error(`Failed to load ${this.src}`);
+      const { MP4Clip } = await import('@designcombo/frames');
+      this.clip = new MP4Clip(response.body);
+    } catch {
       this.clip = null;
     }
   }
 
-  calculateFilmstripDimensions({ segmentIndex, widthOnScreen }) {
+  calculateFilmstripDimensions({ segmentIndex, widthOnScreen }: { segmentIndex: number; widthOnScreen: number }) {
     const filmstripOffset = segmentIndex * this.segmentSize;
     const shouldUseLeftBacklog = segmentIndex > 0;
     const leftBacklogSize = shouldUseLeftBacklog ? this.segmentSize : 0;
@@ -132,33 +148,24 @@ class Video extends Trimmable {
   }
 
   async loadFallbackThumbnail() {
-    const fallbackThumbnail = this.previewUrl;
-    if (!fallbackThumbnail) return;
-    return new Promise(resolve => {
-      const img = new Image();
-      img.crossOrigin = 'anonymous';
-      img.src = `${fallbackThumbnail}?t=${Date.now()}`;
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        if (!ctx) return;
-        const aspectRatio = img.width / img.height;
-        const targetHeight = 40;
-        const targetWidth = Math.round(targetHeight * aspectRatio);
-        canvas.height = targetHeight;
-        canvas.width = targetWidth;
-        ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
-        const resizedImg = new Image();
-        resizedImg.src = canvas.toDataURL();
-        this.aspectRatio = aspectRatio;
-        this.thumbnailWidth = targetWidth;
-        this.thumbnailCache.setThumbnail('fallback', resizedImg);
-        resolve();
-      };
-    });
+    if (!this.previewUrl) return;
+    const img = await loadImage(withCacheBuster(this.previewUrl), true);
+    if (!img) return;
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    const aspectRatio = img.width / img.height;
+    canvas.height = this.thumbnailHeight;
+    canvas.width = Math.round(this.thumbnailHeight * aspectRatio);
+    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+    const resized = await loadImage(canvas.toDataURL());
+    if (!resized) return;
+    this.aspectRatio = aspectRatio;
+    this.thumbnailWidth = canvas.width;
+    this.thumbnailCache.setThumbnail('fallback', resized);
   }
 
-  generateTimestamps(startTime, count) {
+  generateTimestamps(startTime: number, count: number) {
     const timePerThumbnail = unitsToTimeMs(this.thumbnailWidth, this.tScale, this.playbackRate);
     return Array.from({ length: count }, (_, i) => {
       const timeInFilmstripe = startTime + i * timePerThumbnail;
@@ -218,23 +225,19 @@ class Video extends Trimmable {
     });
   }
 
-  async loadThumbnailBatch(thumbnails) {
-    const loadPromises = thumbnails.map(async thumbnail => {
-      if (this.thumbnailCache.getThumbnail(thumbnail.ts)) return;
-      return new Promise(resolve => {
-        const img = new Image();
-        img.src = URL.createObjectURL(thumbnail.img);
-        img.onload = () => {
-          URL.revokeObjectURL(img.src);
-          this.thumbnailCache.setThumbnail(thumbnail.ts, img);
-          resolve();
-        };
-      });
-    });
-    await Promise.all(loadPromises);
+  async loadThumbnailBatch(thumbnails: { ts: number; img: Blob }[]) {
+    await Promise.all(
+      thumbnails.map(async ({ ts, img }) => {
+        if (this.thumbnailCache.getThumbnail(ts)) return;
+        const url = URL.createObjectURL(img);
+        const image = await loadImage(url);
+        URL.revokeObjectURL(url);
+        if (image) this.thumbnailCache.setThumbnail(ts, image);
+      }),
+    );
   }
 
-  _render(ctx) {
+  _render(ctx: CanvasRenderingContext2D) {
     super._render(ctx);
     ctx.save();
     ctx.translate(-this.width / 2, -this.height / 2);
@@ -242,19 +245,17 @@ class Video extends Trimmable {
     ctx.rect(0, 0, this.width, this.height);
     ctx.clip();
     this.renderToOffscreen();
-    if (Math.floor(this.width) === 0) return;
-    if (!this.offscreenCanvas) return;
-    ctx.drawImage(this.offscreenCanvas, 0, 0);
+    if (Math.floor(this.width) > 0 && this.offscreenCanvas) ctx.drawImage(this.offscreenCanvas, 0, 0);
     ctx.restore();
     this.updateSelected(ctx);
   }
 
-  setDuration(duration) {
+  setDuration(duration: number) {
     this.duration = duration;
     this.prevDuration = duration;
   }
 
-  async setSrc(src) {
+  async setSrc(src: string) {
     super.setSrc(src);
     this.clip = null;
     await this.initialize();
@@ -271,7 +272,7 @@ class Video extends Trimmable {
     this.renderToOffscreen(true);
   }
 
-  renderToOffscreen(force) {
+  renderToOffscreen(force?: boolean) {
     if (!this.offscreenCtx) return;
     if (!this.isDirty && !force) return;
     if (!this.offscreenCanvas) return;
@@ -301,7 +302,7 @@ class Video extends Trimmable {
     this.isDirty = false;
   }
 
-  drawTextIdentity(ctx) {
+  drawTextIdentity(ctx: CanvasRenderingContext2D) {
     const iconPath = new Path2D(
       'M16.5625 0.925L12.5 3.275V0.625L11.875 0H0.625L0 0.625V9.375L0.625 10H11.875L12.5 9.375V6.875L16.5625 9.2125L17.5 8.625V1.475L16.5625 0.925ZM11.25 8.75H1.25V1.25H11.25V8.75ZM16.25 7.5L12.5 5.375V4.725L16.25 2.5V7.5Z',
     );
@@ -319,12 +320,12 @@ class Video extends Trimmable {
     ctx.restore();
   }
 
-  setSelected(selected) {
+  setSelected(selected: boolean) {
     this.isSelected = selected;
     this.set({ dirty: true });
   }
 
-  calulateWidthOnScreen() {
+  calculateWidthOnScreen() {
     const canvasEl = document.getElementById('designcombo-timeline-canvas');
     const canvasWidth = canvasEl?.clientWidth;
     const scrollLeft = this.scrollLeft;
@@ -335,13 +336,8 @@ class Video extends Trimmable {
     return Math.max(visibleHeight - cutFromBottomEdge, 0);
   }
 
-  calculateOffscreenWidth({ scrollLeft }) {
-    const offscreenWidth = Math.min(this.left + scrollLeft, 0);
-    return Math.abs(offscreenWidth);
-  }
-
-  onScrollChange({ scrollLeft, force }) {
-    const offscreenWidth = this.calculateOffscreenWidth({ scrollLeft });
+  onScrollChange({ scrollLeft, force }: { scrollLeft: number; force?: boolean }) {
+    const offscreenWidth = Math.abs(Math.min(this.left + scrollLeft, 0));
     const trimFromSize = timeMsToUnits(this.trim.from, this.tScale, this.playbackRate);
     const offscreenSegments = calculateOffscreenSegments(offscreenWidth, trimFromSize, this.segmentSize);
     this.offscreenSegments = offscreenSegments;
@@ -358,9 +354,9 @@ class Video extends Trimmable {
     }
     if (!this.isFetchingThumbnails || force) {
       this.scrollLeft = scrollLeft;
-      const widthOnScreen = this.calulateWidthOnScreen();
+      const widthOnScreen = this.calculateWidthOnScreen();
       const { filmstripOffset, filmstripStartTime, filmstrimpThumbnailsCount } = this.calculateFilmstripDimensions({
-        widthOnScreen: this.calulateWidthOnScreen(),
+        widthOnScreen,
         segmentIndex: segmentToDraw,
       });
       this.nextFilmstrip = {

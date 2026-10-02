@@ -1,82 +1,36 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useEffect, useRef, useState, type ReactNode } from 'react';
 
-// Removed TypeScript interface and React.FC generic.
-export const HorizontalScroll = ({
-  children,
-  className = '',
-  showShadows = true,
-  shadowColor = 'black',
-  shadowWidth = 6,
-  debug = false,
-}) => {
-  const [showLeftShadow, setShowLeftShadow] = useState(false);
-  const [showRightShadow, setShowRightShadow] = useState(false);
-  const scrollRef = useRef(null);
-
-  const checkShadows = () => {
-    if (!scrollRef.current) return;
-
-    const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
-    const shouldShowLeft = scrollLeft > 0;
-    const shouldShowRight = scrollLeft < scrollWidth - clientWidth - 1;
-
-    setShowLeftShadow(shouldShowLeft);
-    setShowRightShadow(shouldShowRight);
-
-    if (debug) {
-      console.log('Scroll check:', {
-        scrollLeft,
-        scrollWidth,
-        clientWidth,
-        shouldShowLeft,
-        shouldShowRight,
-      });
-    }
-  };
+export const HorizontalScroll = ({ children, className = '' }: { children: ReactNode; className?: string }) => {
+  const [shadows, setShadows] = useState({ left: false, right: false });
+  const scrollRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const element = scrollRef.current;
     if (!element) return;
-
-    checkShadows();
-    element.addEventListener('scroll', checkShadows);
-    window.addEventListener('resize', checkShadows);
-
+    const update = () =>
+      setShadows({
+        left: element.scrollLeft > 0,
+        right: element.scrollLeft < element.scrollWidth - element.clientWidth - 1,
+      });
+    update();
+    const observer = new ResizeObserver(update);
+    observer.observe(element);
+    element.addEventListener('scroll', update);
     return () => {
-      element.removeEventListener('scroll', checkShadows);
-      window.removeEventListener('resize', checkShadows);
+      observer.disconnect();
+      element.removeEventListener('scroll', update);
     };
-  }, [debug]);
-
-  const shadowClasses = {
-    left: `absolute left-0 top-0 bottom-0 w-${shadowWidth} bg-gradient-to-r from-${shadowColor}/50 via-${shadowColor}/30 to-transparent pointer-events-none z-20`,
-    right: `absolute right-0 top-0 bottom-0 w-${shadowWidth} bg-gradient-to-l from-${shadowColor}/50 via-${shadowColor}/30 to-transparent pointer-events-none z-20`,
-  };
+  }, []);
 
   return (
     <div className={`relative ${className}`}>
-      {/* Debug indicator */}
-      {debug && (
-        <div className='absolute -top-6 left-0 text-xs text-red-400'>
-          Left: {showLeftShadow ? 'ON' : 'OFF'} | Right: {showRightShadow ? 'ON' : 'OFF'}
-        </div>
+      {shadows.left && (
+        <div className='pointer-events-none absolute inset-y-0 left-0 z-20 w-6 bg-gradient-to-r from-black/50 via-black/30 to-transparent' />
       )}
-
-      {/* Left shadow */}
-      {showShadows && showLeftShadow && (
-        <div className='absolute left-0 top-0 bottom-0 w-6 bg-gradient-to-r from-black/50 via-black/30 to-transparent pointer-events-none z-20' />
+      {shadows.right && (
+        <div className='pointer-events-none absolute inset-y-0 right-0 z-20 w-6 bg-gradient-to-l from-black/50 via-black/30 to-transparent' />
       )}
-
-      {/* Right shadow */}
-      {showShadows && showRightShadow && (
-        <div className='absolute right-0 top-0 bottom-0 w-6 bg-gradient-to-l from-black/50 via-black/30 to-transparent pointer-events-none z-20' />
-      )}
-
-      {/* Scrollable content */}
-      <div
-        ref={scrollRef}
-        className='overflow-x-auto [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]'
-      >
+      <div ref={scrollRef} className='overflow-x-auto [scrollbar-width:none] [&::-webkit-scrollbar]:hidden'>
         {children}
       </div>
     </div>

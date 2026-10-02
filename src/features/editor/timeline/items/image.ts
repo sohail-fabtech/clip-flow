@@ -1,11 +1,11 @@
-import { Resizable, Pattern, util, Control } from '@designcombo/timeline';
+import { Pattern, Resizable, util, type ResizableProps } from '@designcombo/timeline';
 
 class Image extends Resizable {
   static type = 'Image';
-  src;
+  declare src: string;
   hasSrc = true;
 
-  constructor(props) {
+  constructor(props: ResizableProps<{ src: string }>) {
     super(props);
     this.id = props.id;
     this.src = props.src;
@@ -14,30 +14,25 @@ class Image extends Resizable {
     this.loadImage();
   }
 
-  _render(ctx) {
+  _render(ctx: CanvasRenderingContext2D) {
     super._render(ctx);
     this.updateSelected(ctx);
   }
 
-  loadImage() {
-    util.loadImage(this.src).then(img => {
-      const imgHeight = img.height;
-      const rectHeight = this.height;
-      const scaleY = rectHeight / imgHeight;
-      const pattern = new Pattern({
-        source: img,
-        repeat: 'repeat-x',
-        patternTransform: [scaleY, 0, 0, scaleY, 0, 0],
-      });
-      this.set('fill', pattern);
+  async loadImage() {
+    try {
+      const img = await util.loadImage(this.src);
+      const scale = this.height / img.height;
+      this.set('fill', new Pattern({ source: img, repeat: 'repeat-x', patternTransform: [scale, 0, 0, scale, 0, 0] }));
       this.canvas?.requestRenderAll();
-    });
+    } catch {
+      return;
+    }
   }
 
-  setSrc(src) {
+  setSrc(src: string) {
     this.src = src;
     this.loadImage();
-    this.canvas?.requestRenderAll();
   }
 }
 

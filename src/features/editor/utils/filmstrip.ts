@@ -1,37 +1,9 @@
-export const calculateThumbnailSegmentLayout = thumbnailWidth => {
-  // Calculate the maximum number of thumbnails based on the thumbnail width
-  let maxThumbnails = Math.floor(1200 / thumbnailWidth);
+const SEGMENT_WIDTH = 1200;
 
-  // Calculate the total width required for the thumbnails
-  let segmentSize = maxThumbnails * thumbnailWidth;
-
-  return {
-    thumbnailsPerSegment: maxThumbnails,
-    segmentSize,
-  };
+export const calculateThumbnailSegmentLayout = (thumbnailWidth: number) => {
+  const thumbnailsPerSegment = Math.floor(SEGMENT_WIDTH / thumbnailWidth);
+  return { thumbnailsPerSegment, segmentSize: thumbnailsPerSegment * thumbnailWidth };
 };
 
-// It calculates the number of segments that are offscreen
-export const calculateOffscreenSegments = (offscreenWidth, trimFromSize, segmentSize) => {
-  const offscreenSegments = Math.floor((offscreenWidth + trimFromSize) / segmentSize);
-  return offscreenSegments;
-};
-
-export function matchTimestampsToNearestThumbnails(timestamps, thumbnailsList) {
-  const results = [];
-
-  timestamps.forEach(ts => {
-    // Find the closest thumbnail
-    const closestThumbnail = thumbnailsList.reduce((prev, curr) => {
-      return Math.abs(curr.ts - ts) < Math.abs(prev.ts - ts) ? curr : prev;
-    });
-
-    // Push the result into the results array
-    results.push({
-      ts,
-      url: closestThumbnail.url,
-    });
-  });
-
-  return results;
-}
+export const calculateOffscreenSegments = (offscreenWidth: number, trimFromSize: number, segmentSize: number) =>
+  Math.floor((offscreenWidth + trimFromSize) / segmentSize);

@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { cn } from '@/lib/utils';
 
-const VisuallyHidden = React.forwardRef(({ className, ...props }, ref) => {
+const VisuallyHidden = React.forwardRef<HTMLSpanElement, React.ComponentProps<'span'>>(({ className, ...props }, ref) => {
   return (
     <span
       ref={ref}

@@ -1,107 +1,21 @@
-import { findIndex } from '@/features/editor/utils/search';
-import { FRAME_INTERVAL, PREVIEW_FRAME_WIDTH, TIMELINE_OFFSET_X } from '@/features/editor/constants/constants';
+import { timeMsToUnits } from '@designcombo/timeline';
+import type { ITimelineScaleState } from '@designcombo/types';
 import { TIMELINE_ZOOM_LEVELS } from '@/features/editor/constants/scale';
 
-export function getPreviousZoomLevel(currentZoom) {
-  const previousZoom = getPreviousZoom(currentZoom);
+const LAST = TIMELINE_ZOOM_LEVELS.length - 1;
 
-  return previousZoom || TIMELINE_ZOOM_LEVELS[0];
-}
+export const getZoomByIndex = (index: number) => TIMELINE_ZOOM_LEVELS[index];
 
-export function getZoomByIndex(index) {
-  return TIMELINE_ZOOM_LEVELS[index];
-}
-export function getNextZoomLevel(currentZoom) {
-  const nextZoom = getNextZoom(currentZoom);
+export const getPreviousZoomLevel = (current: ITimelineScaleState) =>
+  TIMELINE_ZOOM_LEVELS.findLast(level => level.zoom < current.zoom) ?? TIMELINE_ZOOM_LEVELS[0];
 
-  return nextZoom || TIMELINE_ZOOM_LEVELS[TIMELINE_ZOOM_LEVELS.length - 1];
-}
+export const getNextZoomLevel = (current: ITimelineScaleState) =>
+  TIMELINE_ZOOM_LEVELS.find(level => level.zoom > current.zoom) ?? TIMELINE_ZOOM_LEVELS[LAST];
 
-export const getPreviousZoom = currentZoom => {
-  // Filter zoom levels that are smaller than the current zoom
-  const smallerZoomLevels = TIMELINE_ZOOM_LEVELS.filter(level => level.zoom < currentZoom.zoom);
-
-  // If there are no smaller zoom levels, return null (no previous zoom)
-  if (smallerZoomLevels.length === 0) {
-    return null;
-  }
-
-  // Get the zoom level with the largest zoom value that's still smaller than the current zoom
-  const previousZoom = smallerZoomLevels.reduce((prev, curr) => (curr.zoom > prev.zoom ? curr : prev));
-
-  return previousZoom;
-};
-
-export const getNextZoom = currentZoom => {
-  // Filter zoom levels that are larger than the current zoom
-  const largerZoomLevels = TIMELINE_ZOOM_LEVELS.filter(level => level.zoom > currentZoom.zoom);
-
-  // If there are no larger zoom levels, return null (no next zoom)
-  if (largerZoomLevels.length === 0) {
-    return null;
-  }
-
-  // Get the zoom level with the smallest zoom value that's still larger than the current zoom
-  const nextZoom = largerZoomLevels.reduce((prev, curr) => (curr.zoom < prev.zoom ? curr : prev));
-
-  return nextZoom;
-};
-
-export function getFitZoomLevel(
-  totalLengthMs,
-  zoom = 1,
-  scrollOffset = 8, // Default fallback value
-) {
-  const getVisibleWidth = () => {
-    const clampedScrollOffset = Math.max(0, scrollOffset);
-
-    const timelineCanvas = document.getElementById('designcombo-timeline-canvas');
-    const offsetWidth = timelineCanvas?.offsetWidth ?? document.body.offsetWidth;
-
-    // Use 1 to prevent NaN because of dividing by 0.
-    return Math.max(1, offsetWidth - clampedScrollOffset);
-  };
-
-  const getFullWidth = () => {
-    if (typeof totalLengthMs === 'number') {
-      return timeMsToUnits(totalLengthMs, zoom);
-    }
-
-    return calculateTimelineWidth(totalLengthMs, zoom);
-  };
-
-  const multiplier = getVisibleWidth() / getFullWidth();
-  const targetZoom = zoom * multiplier;
-
-  const fitZoomIndex = findIndex(TIMELINE_ZOOM_LEVELS, level => {
-    return level.zoom > targetZoom;
-  });
-
-  // const clampedIndex = clamp(fitZoomIndex, 0, TIMELINE_ZOOM_LEVELS.length - 1);
-
-  return {
-    segments: 5,
-    index: fitZoomIndex,
-    zoom: targetZoom,
-    unit: 1 / targetZoom,
-  };
-}
-
-export function timeMsToUnits(timeMs, zoom = 1) {
-  const zoomedFrameWidth = PREVIEW_FRAME_WIDTH * zoom;
-  const frames = timeMs * (60 / 1000);
-
-  return frames * zoomedFrameWidth;
-}
-
-export function unitsToTimeMs(units, zoom = 1) {
-  const zoomedFrameWidth = PREVIEW_FRAME_WIDTH * zoom;
-
-  const frames = units / zoomedFrameWidth;
-
-  return frames * FRAME_INTERVAL;
-}
-
-export function calculateTimelineWidth(totalLengthMs, zoom = 1) {
-  return timeMsToUnits(totalLengthMs, zoom);
+export function getFitZoomLevel(totalLengthMs: number, zoom = 1, scrollOffset = 8): ITimelineScaleState {
+  const canvasWidth = document.getElementById('designcombo-timeline-canvas')?.offsetWidth ?? document.body.offsetWidth;
+  const visibleWidth = Math.max(1, canvasWidth - Math.max(0, scrollOffset));
+  const targetZoom = zoom * (visibleWidth / timeMsToUnits(totalLengthMs, zoom));
+  const index = TIMELINE_ZOOM_LEVELS.findIndex(level => level.zoom > targetZoom);
+  return { segments: 5, index: index === -1 ? LAST : index, zoom: targetZoom, unit: 1 / targetZoom };
 }

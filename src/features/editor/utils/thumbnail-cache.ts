@@ -1,45 +1,25 @@
-class ThumbnailCache {
-  constructor() {
-    this.cache = {};
-    this.maxCacheSize = 500; // Set a limit to the number of thumbnails
-    this.accessOrder = []; // Track access order
+type Key = number | 'fallback';
+
+const MAX_SIZE = 500;
+
+export default class ThumbnailCache {
+  private cache = new Map<Key, HTMLImageElement>();
+
+  setThumbnail(key: Key, img: HTMLImageElement) {
+    this.cache.delete(key);
+    this.cache.set(key, img);
+    if (this.cache.size > MAX_SIZE) this.cache.delete(this.cache.keys().next().value!);
   }
 
-  setThumbnail(timestamp, img) {
-    if (this.accessOrder.length >= this.maxCacheSize) {
-      // Remove the least recently used thumbnail
-      const oldestTimestamp = this.accessOrder.shift();
-      if (oldestTimestamp !== undefined) {
-        delete this.cache[oldestTimestamp];
-      }
-    }
-    this.cache[timestamp] = img;
-    this.accessOrder.push(timestamp); // Add to the end to indicate recent use
-  }
-
-  getThumbnail(timestamp) {
-    const img = this.cache[timestamp];
-    if (img) {
-      // Update access order when thumbnail is accessed
-      this.accessOrder = this.accessOrder.filter(t => t !== timestamp);
-      this.accessOrder.push(timestamp); // Move to the end (most recently used)
-    }
+  getThumbnail(key: Key) {
+    const img = this.cache.get(key);
+    if (img) this.setThumbnail(key, img);
     return img;
   }
 
-  clearCache() {
-    this.cache = {};
-    this.accessOrder = [];
-  }
-
   clearCacheButFallback() {
-    const fallback = this.getThumbnail('fallback');
-    this.cache = {};
-    this.accessOrder = [];
-    if (fallback) {
-      this.setThumbnail('fallback', fallback);
-    }
+    const fallback = this.cache.get('fallback');
+    this.cache.clear();
+    if (fallback) this.cache.set('fallback', fallback);
   }
 }
-
-export default ThumbnailCache;
