@@ -75,7 +75,8 @@ export class GradeRenderer {
     gl.attachShader(program, shader(gl.FRAGMENT_SHADER, fragment));
     gl.bindAttribLocation(program, 0, 'aPosition');
     gl.linkProgram(program);
-    if (!gl.getProgramParameter(program, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(program) ?? 'Link error');
+    if (!gl.getProgramParameter(program, gl.LINK_STATUS))
+      throw new Error(gl.getProgramInfoLog(program) ?? 'Link error');
     return { program, locations: new Map() };
   }
 
@@ -149,7 +150,10 @@ export class GradeRenderer {
     const texel = [1 / this.size.width, 1 / this.size.height];
     if (angle !== undefined) {
       const rad = (angle * Math.PI) / 180;
-      this.pass('BLUR', [input], output, { uDirection: [Math.cos(rad) * texel[0], Math.sin(rad) * texel[1]], uRadius: radius });
+      this.pass('BLUR', [input], output, {
+        uDirection: [Math.cos(rad) * texel[0], Math.sin(rad) * texel[1]],
+        uRadius: radius,
+      });
       return output;
     }
     this.pass('BLUR', [input], scratch, { uDirection: [texel[0], 0], uRadius: radius });
@@ -163,7 +167,18 @@ export class GradeRenderer {
     const gl = this.gl;
     gl.bindTexture(gl.TEXTURE_3D, this.lut);
     const size = lut?.size ?? 1;
-    gl.texImage3D(gl.TEXTURE_3D, 0, gl.RGBA, size, size, size, 0, gl.RGBA, gl.UNSIGNED_BYTE, lut?.data ?? new Uint8Array(4));
+    gl.texImage3D(
+      gl.TEXTURE_3D,
+      0,
+      gl.RGBA,
+      size,
+      size,
+      size,
+      0,
+      gl.RGBA,
+      gl.UNSIGNED_BYTE,
+      lut?.data ?? new Uint8Array(4),
+    );
   }
 
   render(source: TexImageSource, width: number, height: number, grade: Grade, softness: number, frame: number) {

@@ -3,8 +3,7 @@ import { create } from 'zustand';
 import { cn } from '@/lib/utils';
 
 export type MenuItem =
-  | { label: string; shortcut?: string; onSelect: () => void; disabled?: boolean; danger?: boolean }
-  | 'separator';
+  { label: string; shortcut?: string; onSelect: () => void; disabled?: boolean; danger?: boolean } | 'separator';
 
 interface MenuStore {
   menu: { x: number; y: number; items: MenuItem[] } | null;

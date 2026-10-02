@@ -14,7 +14,10 @@ function parseTime(value: string) {
 }
 
 export function parseSubtitles(source: string): Cue[] {
-  const blocks = source.replace(/\r/g, '').replace(/^WEBVTT[^\n]*\n/, '').split(/\n{2,}/);
+  const blocks = source
+    .replace(/\r/g, '')
+    .replace(/^WEBVTT[^\n]*\n/, '')
+    .split(/\n{2,}/);
   const cues: Cue[] = [];
   for (const block of blocks) {
     const lines = block.split('\n').filter(Boolean);

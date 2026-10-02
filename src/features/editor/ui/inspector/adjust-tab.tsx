@@ -26,16 +26,26 @@ declare global {
 export function AdjustTab({ clips }: { clips: Clip[] }) {
   const lutInput = useRef<HTMLInputElement>(null);
   const visual = clips.filter(c => isVisual(c) && c.kind !== 'text' && c.kind !== 'shape') as VisualClip[];
-  if (!visual.length) return <div className='p-4 text-xs text-ink-4'>Color adjustments apply to video and image clips.</div>;
+  if (!visual.length)
+    return <div className='p-4 text-xs text-ink-4'>Color adjustments apply to video and image clips.</div>;
   const ids = visual.map(c => c.id);
   const grade = visual[0].grade;
 
   const set = (name: string, recipe: (g: Grade) => void, phase: 'live' | 'commit' = 'commit') =>
     editClips(ids, name, clip => isVisual(clip) && recipe(clip.grade), phase);
-  const reset = (section: Section) => set(`Reset ${section}`, g => void Object.assign(g, { [section]: defaultGrade()[section] }));
-  const enable = (section: Section) => (enabled: boolean) => set(`Toggle ${section}`, g => void (g[section].enabled = enabled));
+  const reset = (section: Section) =>
+    set(`Reset ${section}`, g => void Object.assign(g, { [section]: defaultGrade()[section] }));
+  const enable = (section: Section) => (enabled: boolean) =>
+    set(`Toggle ${section}`, g => void (g[section].enabled = enabled));
 
-  const slider = <S extends 'basic' | 'effects'>(section: S, key: keyof Grade[S] & string, label: string, min: number, max: number, extra: Partial<React.ComponentProps<typeof SliderRow>> = {}) => (
+  const slider = <S extends 'basic' | 'effects'>(
+    section: S,
+    key: keyof Grade[S] & string,
+    label: string,
+    min: number,
+    max: number,
+    extra: Partial<React.ComponentProps<typeof SliderRow>> = {},
+  ) => (
     <SliderRow
       key={key}
       label={label}
@@ -68,7 +78,12 @@ export function AdjustTab({ clips }: { clips: Clip[] }) {
 
   return (
     <>
-      <Group title='Basic Correction' enabled={grade.basic.enabled} onEnabledChange={enable('basic')} onReset={() => reset('basic')}>
+      <Group
+        title='Basic Correction'
+        enabled={grade.basic.enabled}
+        onEnabledChange={enable('basic')}
+        onReset={() => reset('basic')}
+      >
         <SubLabel>Tone</SubLabel>
         {slider('basic', 'exposure', 'Exposure', -3, 3, { scale: 1, precision: 2, unit: 'EV' })}
         {slider('basic', 'contrast', 'Contrast', -1, 1)}
@@ -84,7 +99,13 @@ export function AdjustTab({ clips }: { clips: Clip[] }) {
         {slider('basic', 'saturation', 'Saturation', -1, 1)}
       </Group>
 
-      <Group title='Curves' defaultOpen={false} enabled={grade.curves.enabled} onEnabledChange={enable('curves')} onReset={() => reset('curves')}>
+      <Group
+        title='Curves'
+        defaultOpen={false}
+        enabled={grade.curves.enabled}
+        onEnabledChange={enable('curves')}
+        onReset={() => reset('curves')}
+      >
         <CurveEditor
           channels={[
             { key: 'master', label: 'Luma', color: '#f2f2f2' },
@@ -97,7 +118,13 @@ export function AdjustTab({ clips }: { clips: Clip[] }) {
         />
       </Group>
 
-      <Group title='Color Wheels' defaultOpen={false} enabled={grade.wheels.enabled} onEnabledChange={enable('wheels')} onReset={() => reset('wheels')}>
+      <Group
+        title='Color Wheels'
+        defaultOpen={false}
+        enabled={grade.wheels.enabled}
+        onEnabledChange={enable('wheels')}
+        onReset={() => reset('wheels')}
+      >
         <div className='flex justify-between gap-1 pt-1'>
           {(['lift', 'gamma', 'gain'] as const).map(key => (
             <WheelPad
@@ -110,7 +137,13 @@ export function AdjustTab({ clips }: { clips: Clip[] }) {
         </div>
       </Group>
 
-      <Group title='Hue Curves' defaultOpen={false} enabled={grade.hueCurves.enabled} onEnabledChange={enable('hueCurves')} onReset={() => reset('hueCurves')}>
+      <Group
+        title='Hue Curves'
+        defaultOpen={false}
+        enabled={grade.hueCurves.enabled}
+        onEnabledChange={enable('hueCurves')}
+        onReset={() => reset('hueCurves')}
+      >
         <CurveEditor
           hue
           background={`linear-gradient(rgba(17,18,20,0.75), rgba(17,18,20,0.75)), ${HUE}`}
@@ -124,8 +157,20 @@ export function AdjustTab({ clips }: { clips: Clip[] }) {
         />
       </Group>
 
-      <Group title='LUTs' defaultOpen={false} enabled={grade.lut.enabled} onEnabledChange={enable('lut')} onReset={() => reset('lut')}>
-        <input ref={lutInput} type='file' accept='.cube' hidden onChange={e => e.target.files?.[0] && loadLut(e.target.files[0])} />
+      <Group
+        title='LUTs'
+        defaultOpen={false}
+        enabled={grade.lut.enabled}
+        onEnabledChange={enable('lut')}
+        onReset={() => reset('lut')}
+      >
+        <input
+          ref={lutInput}
+          type='file'
+          accept='.cube'
+          hidden
+          onChange={e => e.target.files?.[0] && loadLut(e.target.files[0])}
+        />
         <Row label='File'>
           {grade.lut.src ? (
             <div className='flex min-w-0 flex-1 items-center gap-1 rounded bg-base px-2 py-1 text-[11px] text-ink-2'>
@@ -140,10 +185,24 @@ export function AdjustTab({ clips }: { clips: Clip[] }) {
             </Button>
           )}
         </Row>
-        <SliderRow label='Intensity' min={0} max={1} value={grade.lut.intensity} unit='%' reset={1} onChange={(v, p) => set('LUT intensity', g => void (g.lut.intensity = v), p)} />
+        <SliderRow
+          label='Intensity'
+          min={0}
+          max={1}
+          value={grade.lut.intensity}
+          unit='%'
+          reset={1}
+          onChange={(v, p) => set('LUT intensity', g => void (g.lut.intensity = v), p)}
+        />
       </Group>
 
-      <Group title='Effects' defaultOpen={false} enabled={grade.effects.enabled} onEnabledChange={enable('effects')} onReset={() => reset('effects')}>
+      <Group
+        title='Effects'
+        defaultOpen={false}
+        enabled={grade.effects.enabled}
+        onEnabledChange={enable('effects')}
+        onReset={() => reset('effects')}
+      >
         <SubLabel>Detail</SubLabel>
         {slider('effects', 'clarity', 'Clarity', -1, 1)}
         {slider('effects', 'dehaze', 'Dehaze', -1, 1)}
@@ -167,16 +226,28 @@ export function AdjustTab({ clips }: { clips: Clip[] }) {
         {slider('effects', 'glowThreshold', 'Threshold', 0, 1, { reset: 0.7 })}
         {slider('effects', 'glowWarmth', 'Warmth', 0, 1)}
         <SubLabel>Chroma Key</SubLabel>
-        <ToggleRow label='Enable' checked={grade.effects.chromaKey} onChange={on => set('Chroma key', g => void (g.effects.chromaKey = on))} />
+        <ToggleRow
+          label='Enable'
+          checked={grade.effects.chromaKey}
+          onChange={on => set('Chroma key', g => void (g.effects.chromaKey = on))}
+        />
         <Row label='Key color'>
-          <ColorSwatch label='Key color' value={grade.effects.chromaColor} onChange={v => set('Key color', g => void (g.effects.chromaColor = v))} />
+          <ColorSwatch
+            label='Key color'
+            value={grade.effects.chromaColor}
+            onChange={v => set('Key color', g => void (g.effects.chromaColor = v))}
+          />
           <IconButton label='Sample key color' onClick={sampleKey}>
             <Pipette />
           </IconButton>
         </Row>
         {slider('effects', 'chromaTolerance', 'Range', 0, 1, { reset: 0.3 })}
         {slider('effects', 'chromaSpill', 'Spill', 0, 1, { reset: 0.5 })}
-        <ToggleRow label='Invert Colors' checked={grade.effects.invert} onChange={on => set('Invert', g => void (g.effects.invert = on))} />
+        <ToggleRow
+          label='Invert Colors'
+          checked={grade.effects.invert}
+          onChange={on => set('Invert', g => void (g.effects.invert = on))}
+        />
       </Group>
     </>
   );

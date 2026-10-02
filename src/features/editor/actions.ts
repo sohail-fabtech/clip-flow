@@ -162,7 +162,9 @@ export function toggleLink() {
   const ids = selection();
   const project = getProject();
   const linked = ids.some(id => project.clips[id]?.linkId);
-  commit(linked ? 'Unlink' : 'Link', draft => (linked ? unlinkClips(draft, expandLinked(draft, ids)) : linkClips(draft, ids)));
+  commit(linked ? 'Unlink' : 'Link', draft =>
+    linked ? unlinkClips(draft, expandLinked(draft, ids)) : linkClips(draft, ids),
+  );
 }
 
 export function detach() {
@@ -194,7 +196,8 @@ export function updateClips(label: string, ids: string[], recipe: (clip: Clip) =
 export function setProp(ids: string[], prop: AnimProp, value: number, apply: (clip: Clip) => void) {
   const frame = getFrame();
   updateClips(`Change ${prop}`, ids, clip => {
-    if (clip.keyframes[prop]?.length) setKeyframe(clip, prop, Math.min(clip.duration - 1, Math.max(0, frame - clip.start)), value);
+    if (clip.keyframes[prop]?.length)
+      setKeyframe(clip, prop, Math.min(clip.duration - 1, Math.max(0, frame - clip.start)), value);
     else apply(clip);
   });
 }
@@ -256,7 +259,14 @@ export function addMarker() {
   const id = nanoid();
   const frame = getFrame();
   commit('Add marker', draft =>
-    upsertMarker(draft, { id, frame, duration: 0, name: `Marker ${draft.markers.length + 1}`, color: '#4094FF', comment: '' }),
+    upsertMarker(draft, {
+      id,
+      frame,
+      duration: 0,
+      name: `Marker ${draft.markers.length + 1}`,
+      color: '#4094FF',
+      comment: '',
+    }),
   );
   ui().selectMarker(id);
 }
@@ -310,7 +320,11 @@ export function captionCues(): Cue[] {
   return Object.values(project.clips)
     .filter((c): c is TextClip => c.kind === 'text' && c.text.caption)
     .sort((a, b) => a.start - b.start)
-    .map(c => ({ start: c.start / project.settings.fps, end: clipEnd(c) / project.settings.fps, text: c.text.content }));
+    .map(c => ({
+      start: c.start / project.settings.fps,
+      end: clipEnd(c) / project.settings.fps,
+      text: c.text.content,
+    }));
 }
 
 export const exportCaptions = (format: 'srt' | 'vtt') =>

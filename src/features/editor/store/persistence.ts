@@ -33,5 +33,4 @@ export const dbAll = <T>(store: StoreName) => run<T[]>(store, 'readonly', s => s
 export const saveProject = (project: Project) => dbPut('projects', project.id, project);
 export const loadProject = (id: string) => dbGet<Project>('projects', id);
 export const deleteProject = (id: string) => dbDelete('projects', id);
-export const listProjects = async () =>
-  (await dbAll<Project>('projects')).sort((a, b) => b.updatedAt - a.updatedAt);
+export const listProjects = async () => (await dbAll<Project>('projects')).sort((a, b) => b.updatedAt - a.updatedAt);

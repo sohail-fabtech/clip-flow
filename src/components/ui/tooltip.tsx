@@ -39,7 +39,7 @@ function TooltipContent({
         {...props}
       >
         {children}
-              </TooltipPrimitive.Content>
+      </TooltipPrimitive.Content>
     </TooltipPrimitive.Portal>
   );
 }

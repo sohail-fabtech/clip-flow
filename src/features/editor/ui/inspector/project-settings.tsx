@@ -68,7 +68,10 @@ export function ProjectSettings() {
           <SelectRow
             label='Aspect ratio'
             value={aspect}
-            options={[...ASPECTS.map(a => ({ value: a.value as string, label: a.label })), { value: 'custom', label: 'Custom…' }]}
+            options={[
+              ...ASPECTS.map(a => ({ value: a.value as string, label: a.label })),
+              { value: 'custom', label: 'Custom…' },
+            ]}
             onChange={value => {
               const preset = ASPECTS.find(a => a.value === value);
               if (preset) resize(sizeFor(preset, Math.min(width, height)));
@@ -79,7 +82,10 @@ export function ProjectSettings() {
           <SelectRow
             label='Resolution'
             value={quality}
-            options={[...QUALITIES.map(q => ({ value: q.value as string, label: q.label })), { value: 'custom', label: `${width}×${height}` }]}
+            options={[
+              ...QUALITIES.map(q => ({ value: q.value as string, label: q.label })),
+              { value: 'custom', label: `${width}×${height}` },
+            ]}
             onChange={value => {
               const short = Number(value);
               if (short) resize(sizeFor({ w: width, h: height }, short));
@@ -87,9 +93,21 @@ export function ProjectSettings() {
           />
         </Row>
         <Row label='Custom size'>
-          <Input type='number' aria-label='Width' value={custom.width} onChange={e => setCustom(c => ({ ...c, width: Number(e.target.value) }))} onKeyDown={e => e.stopPropagation()} />
+          <Input
+            type='number'
+            aria-label='Width'
+            value={custom.width}
+            onChange={e => setCustom(c => ({ ...c, width: Number(e.target.value) }))}
+            onKeyDown={e => e.stopPropagation()}
+          />
           <span className='text-ink-4'>×</span>
-          <Input type='number' aria-label='Height' value={custom.height} onChange={e => setCustom(c => ({ ...c, height: Number(e.target.value) }))} onKeyDown={e => e.stopPropagation()} />
+          <Input
+            type='number'
+            aria-label='Height'
+            value={custom.height}
+            onChange={e => setCustom(c => ({ ...c, height: Number(e.target.value) }))}
+            onKeyDown={e => e.stopPropagation()}
+          />
           <Button
             size='sm'
             variant='secondary'
@@ -107,12 +125,18 @@ export function ProjectSettings() {
             onChange={value => commit('Frame rate', draft => void (draft.settings.fps = Number(value)))}
           />
         </Row>
-        <ColorRow label='Background' value={background} onChange={v => commit('Background', draft => void (draft.settings.background = v))} />
+        <ColorRow
+          label='Background'
+          value={background}
+          onChange={v => commit('Background', draft => void (draft.settings.background = v))}
+        />
         <Row label='Duration'>
           <span className='font-mono text-xs text-ink-2'>{timecode(projectDuration(project), fps)}</span>
         </Row>
       </Group>
-      <div className='p-4 text-[11px] leading-relaxed text-ink-4'>Select a clip on the timeline to edit its properties.</div>
+      <div className='p-4 text-[11px] leading-relaxed text-ink-4'>
+        Select a clip on the timeline to edit its properties.
+      </div>
     </>
   );
 }

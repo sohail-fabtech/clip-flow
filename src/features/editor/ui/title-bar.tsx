@@ -1,6 +1,18 @@
 import { useRef } from 'react';
 import Link from 'next/link';
-import { Check, ChevronLeft, CircleAlert, Download, FolderOpen, Keyboard, Loader2, MoreHorizontal, Redo2, Undo2, Upload } from 'lucide-react';
+import {
+  Check,
+  ChevronLeft,
+  CircleAlert,
+  Download,
+  FolderOpen,
+  Keyboard,
+  Loader2,
+  MoreHorizontal,
+  Redo2,
+  Undo2,
+  Upload,
+} from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import AutosizeInput from '@/components/ui/autosize-input';
@@ -51,7 +63,11 @@ export function TitleBar({ status, onOpenProject }: { status: SaveStatus; onOpen
           }
         }}
       />
-      <Link href='/' className='flex items-center gap-1 rounded-md px-1.5 py-1 text-xs text-ink-3 hover:bg-white/8 hover:text-ink' aria-label='All projects'>
+      <Link
+        href='/'
+        className='flex items-center gap-1 rounded-md px-1.5 py-1 text-xs text-ink-3 hover:bg-white/8 hover:text-ink'
+        aria-label='All projects'
+      >
         <ChevronLeft className='size-4' /> Projects
       </Link>
       <div className='mx-1 h-4 w-px bg-line' />
@@ -67,7 +83,9 @@ export function TitleBar({ status, onOpenProject }: { status: SaveStatus; onOpen
           aria-label='Project name'
           value={name}
           onChange={e => edit('Rename project', d => void (d.name = e.target.value), 'live')}
-          onBlur={e => edit('Rename project', d => void (d.name = e.target.value.trim() || 'Untitled project'), 'commit')}
+          onBlur={e =>
+            edit('Rename project', d => void (d.name = e.target.value.trim() || 'Untitled project'), 'commit')
+          }
           onKeyDown={e => {
             e.stopPropagation();
             if (e.key === 'Enter') (e.target as HTMLInputElement).blur();
@@ -85,7 +103,11 @@ export function TitleBar({ status, onOpenProject }: { status: SaveStatus; onOpen
       </IconButton>
       <Popover>
         <PopoverTrigger asChild>
-          <button type='button' aria-label='Project menu' className='inline-flex size-7 items-center justify-center rounded-md text-ink-3 hover:bg-white/8 hover:text-ink'>
+          <button
+            type='button'
+            aria-label='Project menu'
+            className='inline-flex size-7 items-center justify-center rounded-md text-ink-3 hover:bg-white/8 hover:text-ink'
+          >
             <MoreHorizontal className='size-4' />
           </button>
         </PopoverTrigger>

@@ -86,16 +86,30 @@ export function ProjectsHome() {
                 )}
               >
                 <span className='flex h-12 items-center'>
-                  <span className='rounded-sm border border-current' style={{ width: (preset.w / Math.max(preset.w, preset.h)) * 44, height: (preset.h / Math.max(preset.w, preset.h)) * 44 }} />
+                  <span
+                    className='rounded-sm border border-current'
+                    style={{
+                      width: (preset.w / Math.max(preset.w, preset.h)) * 44,
+                      height: (preset.h / Math.max(preset.w, preset.h)) * 44,
+                    }}
+                  />
                 </span>
                 {preset.label}
               </button>
             ))}
             <div className='ml-auto flex gap-2'>
-              <button type='button' onClick={() => fileRef.current?.click()} className='flex h-9 items-center gap-2 rounded-md border border-line px-3 text-xs text-ink-2 hover:bg-white/5'>
+              <button
+                type='button'
+                onClick={() => fileRef.current?.click()}
+                className='flex h-9 items-center gap-2 rounded-md border border-line px-3 text-xs text-ink-2 hover:bg-white/5'
+              >
                 <FolderOpen className='size-4' /> Open file
               </button>
-              <button type='button' onClick={create} className='flex h-9 items-center gap-2 rounded-md bg-primary px-4 text-xs font-medium text-primary-foreground hover:bg-white'>
+              <button
+                type='button'
+                onClick={create}
+                className='flex h-9 items-center gap-2 rounded-md bg-primary px-4 text-xs font-medium text-primary-foreground hover:bg-white'
+              >
                 <Plus className='size-4' /> Create
               </button>
             </div>
@@ -107,7 +121,13 @@ export function ProjectsHome() {
             <h2 className='text-sm font-medium'>My projects</h2>
             <div className='flex w-64 items-center gap-2 rounded-md border border-line bg-surface px-2'>
               <Search className='size-3.5 text-ink-4' />
-              <input value={query} onChange={e => setQuery(e.target.value)} placeholder='Search projects' aria-label='Search projects' className='h-8 flex-1 bg-transparent text-xs outline-none' />
+              <input
+                value={query}
+                onChange={e => setQuery(e.target.value)}
+                placeholder='Search projects'
+                aria-label='Search projects'
+                className='h-8 flex-1 bg-transparent text-xs outline-none'
+              />
             </div>
           </div>
           {projects === null ? null : visible.length === 0 ? (
@@ -117,8 +137,15 @@ export function ProjectsHome() {
           ) : (
             <div className='grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-3'>
               {visible.map(project => (
-                <div key={project.id} className='group relative rounded-lg border border-line bg-surface transition-colors hover:border-line-strong'>
-                  <button type='button' onClick={() => router.push(`/editor/${project.id}`)} className='block w-full text-left'>
+                <div
+                  key={project.id}
+                  className='group relative rounded-lg border border-line bg-surface transition-colors hover:border-line-strong'
+                >
+                  <button
+                    type='button'
+                    onClick={() => router.push(`/editor/${project.id}`)}
+                    className='block w-full text-left'
+                  >
                     <div className='flex aspect-video items-center justify-center rounded-t-lg bg-raised'>
                       <span className='font-mono text-[11px] text-ink-4'>
                         {project.settings.width}×{project.settings.height}

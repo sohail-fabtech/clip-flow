@@ -19,7 +19,8 @@ export function snap(values: number[], points: number[], threshold: number) {
   for (const value of values) {
     for (const point of points) {
       const delta = point - value;
-      if (Math.abs(delta) <= threshold && (!best || Math.abs(delta) < Math.abs(best.delta))) best = { delta, at: point };
+      if (Math.abs(delta) <= threshold && (!best || Math.abs(delta) < Math.abs(best.delta)))
+        best = { delta, at: point };
     }
   }
   return best;

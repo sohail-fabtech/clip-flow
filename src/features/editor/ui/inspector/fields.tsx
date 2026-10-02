@@ -26,7 +26,15 @@ interface AnimRowProps {
 
 const identity = (value: number) => value;
 
-export function AnimRow({ label, prop, clips, toDisplay = identity, fromDisplay = identity, unit, ...range }: AnimRowProps) {
+export function AnimRow({
+  label,
+  prop,
+  clips,
+  toDisplay = identity,
+  fromDisplay = identity,
+  unit,
+  ...range
+}: AnimRowProps) {
   const frame = usePlaybackStore(s => s.frame);
   const primary = clips[0];
   const ids = clips.map(c => c.id);
@@ -54,7 +62,11 @@ export function AnimRow({ label, prop, clips, toDisplay = identity, fromDisplay 
               <ChevronLeft />
             </IconButton>
           )}
-          <KeyframeToggle active={active} has={has} onToggle={() => toggleKeyframe(ids, prop, clip => baseValue(clip, prop))} />
+          <KeyframeToggle
+            active={active}
+            has={has}
+            onToggle={() => toggleKeyframe(ids, prop, clip => baseValue(clip, prop))}
+          />
           {has && (
             <IconButton
               label='Next keyframe'
@@ -96,7 +108,19 @@ interface SliderRowProps {
   gradient?: string;
 }
 
-export function SliderRow({ label, value, onChange, min, max, step = 0.01, scale = 100, precision = 0, unit, reset = 0, gradient }: SliderRowProps) {
+export function SliderRow({
+  label,
+  value,
+  onChange,
+  min,
+  max,
+  step = 0.01,
+  scale = 100,
+  precision = 0,
+  unit,
+  reset = 0,
+  gradient,
+}: SliderRowProps) {
   const [local, setLocal] = useState(value);
   useEffect(() => setLocal(value), [value]);
   const clamp = (v: number) => Math.min(max, Math.max(min, v));
@@ -148,16 +172,34 @@ export function NumberRow({
 }) {
   return (
     <Row label={label}>
-      <ScrubNumber label={label} value={value} onChange={v => onChange(v, 'live')} onCommit={v => onChange(v, 'commit')} {...rest} />
+      <ScrubNumber
+        label={label}
+        value={value}
+        onChange={v => onChange(v, 'live')}
+        onCommit={v => onChange(v, 'commit')}
+        {...rest}
+      />
     </Row>
   );
 }
 
-export function ColorSwatch({ value, onChange, label }: { value: string; onChange: (value: string) => void; label: string }) {
+export function ColorSwatch({
+  value,
+  onChange,
+  label,
+}: {
+  value: string;
+  onChange: (value: string) => void;
+  label: string;
+}) {
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <button type='button' aria-label={label} className='flex h-6 items-center gap-1.5 rounded border border-line bg-base pr-2 pl-1 text-[11px] text-ink-2 hover:border-line-strong'>
+        <button
+          type='button'
+          aria-label={label}
+          className='flex h-6 items-center gap-1.5 rounded border border-line bg-base pr-2 pl-1 text-[11px] text-ink-2 hover:border-line-strong'
+        >
           <span className='checkerboard size-4 rounded-sm border border-white/20' style={{ backgroundColor: value }}>
             <span className='block size-full rounded-sm' style={{ backgroundColor: value }} />
           </span>
@@ -171,7 +213,15 @@ export function ColorSwatch({ value, onChange, label }: { value: string; onChang
   );
 }
 
-export function ColorRow({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) {
+export function ColorRow({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+}) {
   return (
     <Row label={label}>
       <ColorSwatch label={label} value={value} onChange={onChange} />
@@ -179,7 +229,15 @@ export function ColorRow({ label, value, onChange }: { label: string; value: str
   );
 }
 
-export function ToggleRow({ label, checked, onChange }: { label: string; checked: boolean; onChange: (checked: boolean) => void }) {
+export function ToggleRow({
+  label,
+  checked,
+  onChange,
+}: {
+  label: string;
+  checked: boolean;
+  onChange: (checked: boolean) => void;
+}) {
   return (
     <Row label={label}>
       <Switch checked={checked} onCheckedChange={onChange} aria-label={label} />

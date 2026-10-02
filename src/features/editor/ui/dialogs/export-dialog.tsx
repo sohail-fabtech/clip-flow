@@ -1,6 +1,13 @@
 import { useState } from 'react';
 import { CircleCheck, CircleX, Loader2 } from 'lucide-react';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { downloadBlob, downloadUrl } from '@/lib/download';
 import { projectDuration } from '@/features/editor/engine/edits';
@@ -46,7 +53,8 @@ export function ExportDialog() {
   const { width, height, fps } = project.settings;
   const hasRange = project.inPoint !== null && project.outPoint !== null;
   const scale = options.resolution === 'match' ? 1 : SHORT_SIDE[options.resolution] / Math.min(width, height);
-  const length = options.range === 'inout' && hasRange ? project.outPoint! - project.inPoint! : projectDuration(project);
+  const length =
+    options.range === 'inout' && hasRange ? project.outPoint! - project.inPoint! : projectDuration(project);
 
   const start = async () => {
     setError(null);
@@ -126,8 +134,8 @@ export function ExportDialog() {
               />
             </Row>
             <div className='rounded-md bg-base px-3 py-2 font-mono text-[11px] text-ink-3'>
-              {Math.round((width * scale) / 2) * 2}×{Math.round((height * scale) / 2) * 2} · {fps} fps · {timecode(length, fps)} ·{' '}
-              .{EXTENSION[options.codec]}
+              {Math.round((width * scale) / 2) * 2}×{Math.round((height * scale) / 2) * 2} · {fps} fps ·{' '}
+              {timecode(length, fps)} · .{EXTENSION[options.codec]}
             </div>
             {error && (
               <div className='flex items-start gap-2 rounded-md bg-danger/10 px-3 py-2 text-xs text-danger'>
@@ -144,17 +152,23 @@ export function ExportDialog() {
             ) : (
               <Loader2 className='size-8 animate-spin text-ink-3' />
             )}
-            <div className='text-sm font-medium'>{job.status === 'COMPLETED' ? 'Export complete' : `Rendering… ${job.progress}%`}</div>
+            <div className='text-sm font-medium'>
+              {job.status === 'COMPLETED' ? 'Export complete' : `Rendering… ${job.progress}%`}
+            </div>
             <div className='h-1 w-full overflow-hidden rounded-full bg-white/10'>
               <div className='h-full bg-selection transition-[width]' style={{ width: `${job.progress}%` }} />
             </div>
-            {job.status === 'PENDING' && <div className='text-[11px] text-ink-4'>The first export prepares the renderer and takes longer.</div>}
+            {job.status === 'PENDING' && (
+              <div className='text-[11px] text-ink-4'>The first export prepares the renderer and takes longer.</div>
+            )}
           </div>
         )}
 
         <DialogFooter>
           {job?.status === 'COMPLETED' && job.url ? (
-            <Button onClick={() => downloadUrl(job.url!, `${safeName(project.name)}.${EXTENSION[options.codec]}`)}>Download</Button>
+            <Button onClick={() => downloadUrl(job.url!, `${safeName(project.name)}.${EXTENSION[options.codec]}`)}>
+              Download
+            </Button>
           ) : (
             <>
               <Button variant='ghost' onClick={() => close(false)}>

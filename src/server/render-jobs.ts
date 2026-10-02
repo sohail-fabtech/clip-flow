@@ -58,7 +58,10 @@ async function run(job: RenderJob, project: Project, options: ExportOptions) {
     const shortSide = Math.min(composition.width, composition.height);
     const scale = options.resolution === 'match' ? 1 : SHORT_SIDE[options.resolution] / shortSide;
     const range =
-      options.range === 'inout' && project.inPoint !== null && project.outPoint !== null && project.outPoint > project.inPoint
+      options.range === 'inout' &&
+      project.inPoint !== null &&
+      project.outPoint !== null &&
+      project.outPoint > project.inPoint
         ? ([project.inPoint, Math.min(project.outPoint, composition.durationInFrames) - 1] as [number, number])
         : null;
     await renderMedia({

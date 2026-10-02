@@ -10,7 +10,8 @@ import { animatedTransform, baseSize } from '@/features/editor/render/layout';
 
 function write(clip: Clip, prop: AnimProp, value: number, frame: number) {
   if (!isVisual(clip)) return;
-  if (clip.keyframes[prop]?.length) setKeyframe(clip, prop, Math.min(clip.duration - 1, Math.max(0, frame - clip.start)), value);
+  if (clip.keyframes[prop]?.length)
+    setKeyframe(clip, prop, Math.min(clip.duration - 1, Math.max(0, frame - clip.start)), value);
   else if (prop !== 'volume') clip.transform[prop] = value;
 }
 

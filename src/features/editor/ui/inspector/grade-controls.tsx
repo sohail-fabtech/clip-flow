@@ -60,7 +60,10 @@ export function CurveEditor<K extends string>({ channels, curves, onChange, back
             key={channel.key}
             type='button'
             onClick={() => setActive(channel.key)}
-            className={cn('h-6 flex-1 rounded text-[11px] text-ink-3 hover:bg-white/8', active === channel.key && 'bg-white/12 text-ink')}
+            className={cn(
+              'h-6 flex-1 rounded text-[11px] text-ink-3 hover:bg-white/8',
+              active === channel.key && 'bg-white/12 text-ink',
+            )}
           >
             <span className='mr-1 inline-block size-2 rounded-full' style={{ background: channel.color }} />
             {channel.label}
@@ -74,7 +77,11 @@ export function CurveEditor<K extends string>({ channels, curves, onChange, back
         style={{ background: background ?? '#111214', height: HEIGHT }}
         onDoubleClick={e => {
           const p = toPoint(e);
-          onChange(active, [...points, p].sort((a, b) => a.x - b.x), 'commit');
+          onChange(
+            active,
+            [...points, p].sort((a, b) => a.x - b.x),
+            'commit',
+          );
         }}
       >
         {[0.25, 0.5, 0.75].map(v => (
@@ -98,7 +105,12 @@ export function CurveEditor<K extends string>({ channels, curves, onChange, back
             onPointerDown={e => drag(i, e)}
             onContextMenu={e => {
               e.preventDefault();
-              if (points.length > 2) onChange(active, points.filter((_, j) => j !== i), 'commit');
+              if (points.length > 2)
+                onChange(
+                  active,
+                  points.filter((_, j) => j !== i),
+                  'commit',
+                );
             }}
           />
         ))}
@@ -110,7 +122,15 @@ export function CurveEditor<K extends string>({ channels, curves, onChange, back
 
 const PAD = 96;
 
-export function WheelPad({ label, value, onChange }: { label: string; value: Wheel; onChange: (wheel: Wheel, phase: 'live' | 'commit') => void }) {
+export function WheelPad({
+  label,
+  value,
+  onChange,
+}: {
+  label: string;
+  value: Wheel;
+  onChange: (wheel: Wheel, phase: 'live' | 'commit') => void;
+}) {
   const ref = useRef<HTMLDivElement>(null);
   const move = (e: { clientX: number; clientY: number }) => {
     const rect = ref.current!.getBoundingClientRect();

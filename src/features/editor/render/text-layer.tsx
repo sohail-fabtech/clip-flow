@@ -80,10 +80,19 @@ export function TextLayer({ clip, localFrame }: { clip: TextClip; localFrame: nu
   if (animation === 'slideUp')
     container = { translate: `0 ${interpolate(enter, [0, 1], [style.fontSize, 0])}px`, opacity: enter };
   if (animation === 'typewriter') {
-    const chars = Math.floor(interpolate(localFrame, [0, Math.min(clip.duration * 0.7, content.length * 2)], [0, content.length], { extrapolateRight: 'clamp' }));
+    const chars = Math.floor(
+      interpolate(localFrame, [0, Math.min(clip.duration * 0.7, content.length * 2)], [0, content.length], {
+        extrapolateRight: 'clamp',
+      }),
+    );
     body = <span style={backgroundCss(style)}>{content.slice(0, chars)}</span>;
   }
-  if (animation === 'wordReveal' || animation === 'wordSlide' || animation === 'highlight' || animation === 'highlightBlock') {
+  if (
+    animation === 'wordReveal' ||
+    animation === 'wordSlide' ||
+    animation === 'highlight' ||
+    animation === 'highlightBlock'
+  ) {
     let index = -1;
     body = (
       <span style={backgroundCss(style)}>

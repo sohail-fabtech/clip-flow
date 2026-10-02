@@ -40,7 +40,9 @@ function clipMenu(event: React.MouseEvent, project: Project, clipId: string) {
     'separator',
     { label: clip.linkId ? 'Unlink' : 'Link', onSelect: actions.toggleLink },
     { label: 'Detach audio', onSelect: actions.detach, disabled: !hasAudio },
-    ...(clip.transitionIn ? [{ label: 'Remove transition', onSelect: () => actions.setTransitionAtCut(clipId, null) }] : []),
+    ...(clip.transitionIn
+      ? [{ label: 'Remove transition', onSelect: () => actions.setTransitionAtCut(clipId, null) }]
+      : []),
     'separator',
     { label: 'Delete', shortcut: '⌫', onSelect: () => actions.remove(false), danger: true },
     { label: 'Ripple delete', shortcut: '⇧⌫', onSelect: () => actions.remove(true), danger: true },
@@ -97,7 +99,8 @@ export function TimelinePanel() {
       const x = frame * useUiStore.getState().zoom;
       el.style.transform = `translateX(${x}px)`;
       const viewWidth = scroller.clientWidth - HEADER_WIDTH;
-      if (playing && (x < scroller.scrollLeft || x > scroller.scrollLeft + viewWidth - 40)) scroller.scrollLeft = x - 40;
+      if (playing && (x < scroller.scrollLeft || x > scroller.scrollLeft + viewWidth - 40))
+        scroller.scrollLeft = x - 40;
     };
     place(getFrame(), false);
     const unsubPlayback = usePlaybackStore.subscribe(s => place(s.frame, s.playing));
@@ -210,7 +213,8 @@ export function TimelinePanel() {
       const cut = clips
         .filter(c => clips.some(prev => clipEnd(prev) === c.start))
         .sort((a, b) => Math.abs(a.start - frame) - Math.abs(b.start - frame))[0];
-      if (cut) actions.setTransitionAtCut(cut.id, { type: transition, duration: Math.round(project.settings.fps / 2) * 2 });
+      if (cut)
+        actions.setTransitionAtCut(cut.id, { type: transition, duration: Math.round(project.settings.fps / 2) * 2 });
     }
   };
 
@@ -220,11 +224,22 @@ export function TimelinePanel() {
       <div ref={scrollerRef} className='relative min-h-0 flex-1 overflow-auto'>
         <div className='relative' style={{ width: HEADER_WIDTH + contentWidth, minHeight: '100%' }}>
           <div className='sticky top-0 z-30 flex'>
-            <div className='sticky left-0 z-50 flex items-center border-r border-b border-line bg-surface px-2 text-[10px] text-ink-4' style={{ width: HEADER_WIDTH, height: RULER_HEIGHT }}>
-              <button type='button' onClick={() => actions.newTrack('video')} className='flex items-center gap-1 rounded px-1 py-0.5 hover:bg-white/8 hover:text-ink'>
+            <div
+              className='sticky left-0 z-50 flex items-center border-r border-b border-line bg-surface px-2 text-[10px] text-ink-4'
+              style={{ width: HEADER_WIDTH, height: RULER_HEIGHT }}
+            >
+              <button
+                type='button'
+                onClick={() => actions.newTrack('video')}
+                className='flex items-center gap-1 rounded px-1 py-0.5 hover:bg-white/8 hover:text-ink'
+              >
                 <Plus className='size-3' /> Video
               </button>
-              <button type='button' onClick={() => actions.newTrack('audio')} className='flex items-center gap-1 rounded px-1 py-0.5 hover:bg-white/8 hover:text-ink'>
+              <button
+                type='button'
+                onClick={() => actions.newTrack('audio')}
+                className='flex items-center gap-1 rounded px-1 py-0.5 hover:bg-white/8 hover:text-ink'
+              >
                 <Plus className='size-3' /> Audio
               </button>
             </div>
@@ -234,7 +249,11 @@ export function TimelinePanel() {
           <div className='flex'>
             <div className='sticky left-0 z-40 flex flex-col'>
               {project.tracks.map(track => (
-                <TrackHeader key={track.id} track={track} canDelete={project.tracks.filter(t => t.kind === track.kind).length > 1} />
+                <TrackHeader
+                  key={track.id}
+                  track={track}
+                  canDelete={project.tracks.filter(t => t.kind === track.kind).length > 1}
+                />
               ))}
             </div>
             <div
@@ -272,7 +291,10 @@ export function TimelinePanel() {
                       />
                     ))}
                   {dropGhost?.trackId === track.id && (
-                    <div className='pointer-events-none absolute top-0 h-full w-0.5 bg-selection' style={{ left: dropGhost.frame * zoom }} />
+                    <div
+                      className='pointer-events-none absolute top-0 h-full w-0.5 bg-selection'
+                      style={{ left: dropGhost.frame * zoom }}
+                    />
                   )}
                 </div>
               ))}
@@ -284,7 +306,10 @@ export function TimelinePanel() {
                 />
               )}
               {snapIndicator !== null && (
-                <div className='pointer-events-none absolute top-0 z-30 h-full w-px bg-selection' style={{ left: snapIndicator * zoom }} />
+                <div
+                  className='pointer-events-none absolute top-0 z-30 h-full w-px bg-selection'
+                  style={{ left: snapIndicator * zoom }}
+                />
               )}
               {marquee && (
                 <div

@@ -64,7 +64,11 @@ export function InspectorPanel() {
   const Content = TAB_CONTENT[active];
   return (
     <div className='flex h-full flex-col bg-surface' role='region' aria-label='Inspector'>
-      <PanelHeader title={sameKind.length > 1 ? `${sameKind.length} clips selected` : primary.kind === 'text' ? 'Text' : primary.name} />
+      <PanelHeader
+        title={
+          sameKind.length > 1 ? `${sameKind.length} clips selected` : primary.kind === 'text' ? 'Text' : primary.name
+        }
+      />
       <div className='flex shrink-0 gap-0.5 border-b border-line-subtle px-2 py-1.5' role='tablist'>
         {tabs.map(key => {
           const { label, icon: Icon } = TABS[key];

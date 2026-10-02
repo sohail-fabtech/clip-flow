@@ -56,7 +56,13 @@ export const defaultGrade = (): Grade => ({
     vibrance: 0,
     saturation: 0,
   },
-  curves: { enabled: true, master: identityCurve(), red: identityCurve(), green: identityCurve(), blue: identityCurve() },
+  curves: {
+    enabled: true,
+    master: identityCurve(),
+    red: identityCurve(),
+    green: identityCurve(),
+    blue: identityCurve(),
+  },
   wheels: {
     enabled: true,
     lift: { x: 0, y: 0, master: 0 },
@@ -202,12 +208,25 @@ export function createTextClip(trackId: string, start: number, fps: number, cont
   };
 }
 
-export function createShapeClip(trackId: string, start: number, fps: number, shape: 'rectangle' | 'ellipse'): ShapeClip {
+export function createShapeClip(
+  trackId: string,
+  start: number,
+  fps: number,
+  shape: 'rectangle' | 'ellipse',
+): ShapeClip {
   return {
     ...base(trackId, start, DEFAULT_IMAGE_SECONDS * fps, shape === 'rectangle' ? 'Rectangle' : 'Ellipse'),
     kind: 'shape',
     transform: defaultTransform(),
     grade: defaultGrade(),
-    shapeContent: { shape, width: 400, height: 400, fill: '#ffffff', strokeColor: '#000000', strokeWidth: 0, radius: 0 },
+    shapeContent: {
+      shape,
+      width: 400,
+      height: 400,
+      fill: '#ffffff',
+      strokeColor: '#000000',
+      strokeWidth: 0,
+      radius: 0,
+    },
   };
 }

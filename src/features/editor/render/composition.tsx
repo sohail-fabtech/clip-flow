@@ -28,7 +28,19 @@ function volumeCurve(clip: MediaClip, pre: number, muted: boolean) {
   };
 }
 
-function VisualLayer({ clip, project, pre, post, muted }: { clip: VisualClip; project: Project; pre: number; post: number; muted: boolean }) {
+function VisualLayer({
+  clip,
+  project,
+  pre,
+  post,
+  muted,
+}: {
+  clip: VisualClip;
+  project: Project;
+  pre: number;
+  post: number;
+  muted: boolean;
+}) {
   const frame = useCurrentFrame();
   const local = frame - pre;
   const keyFrame = Math.min(clip.duration - 1, Math.max(0, local));
@@ -79,7 +91,10 @@ function VisualLayer({ clip, project, pre, post, muted }: { clip: VisualClip; pr
       );
   } else if (clip.kind === 'image') {
     const asset = project.assets[clip.assetId];
-    if (asset) content = <ImageMedia key={grade ? 'gl' : 'plain'} src={asset.src} grade={grade} softness={transform.edgeSoftness} />;
+    if (asset)
+      content = (
+        <ImageMedia key={grade ? 'gl' : 'plain'} src={asset.src} grade={grade} softness={transform.edgeSoftness} />
+      );
   } else if (clip.kind === 'text') {
     content = <TextLayer clip={clip} localFrame={local} />;
   } else {

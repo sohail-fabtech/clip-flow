@@ -182,10 +182,18 @@ export function beginClipGesture(event: React.PointerEvent, clipId: string, mode
           }
         } else if (mode === 'trim-end') {
           trimEnd(draft, id, clipEnd(original) + delta);
-          if (ripple) rippleShift(draft, original.trackId, clipEnd(original), clipEnd(draft.clips[id]) - clipEnd(original), new Set(ids));
+          if (ripple)
+            rippleShift(
+              draft,
+              original.trackId,
+              clipEnd(original),
+              clipEnd(draft.clips[id]) - clipEnd(original),
+              new Set(ids),
+            );
         }
         const trimmed = draft.clips[id];
-        if (!ripple && mode !== 'slip') clearRange(draft, trimmed.trackId, trimmed.start, clipEnd(trimmed), new Set([id]));
+        if (!ripple && mode !== 'slip')
+          clearRange(draft, trimmed.trackId, trimmed.start, clipEnd(trimmed), new Set([id]));
       }
     });
   };

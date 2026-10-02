@@ -20,7 +20,12 @@ export function edit(label: string, recipe: Recipe, phase: 'live' | 'commit') {
   }
 }
 
-export const editClips = (ids: string[], label: string, recipe: (clip: Clip) => void, phase: 'live' | 'commit' = 'commit') =>
+export const editClips = (
+  ids: string[],
+  label: string,
+  recipe: (clip: Clip) => void,
+  phase: 'live' | 'commit' = 'commit',
+) =>
   edit(
     label,
     draft => {

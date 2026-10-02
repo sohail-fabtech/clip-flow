@@ -21,7 +21,9 @@ export function ShortcutsDialog() {
               <div className='space-y-1.5'>
                 {group.items.map(([keys, label]) => (
                   <div key={label} className='flex items-baseline gap-3'>
-                    <kbd className='min-w-24 shrink-0 font-mono text-[11px] text-ink-2'>{keys.replace(/Mod\+?/g, mod)}</kbd>
+                    <kbd className='min-w-24 shrink-0 font-mono text-[11px] text-ink-2'>
+                      {keys.replace(/Mod\+?/g, mod)}
+                    </kbd>
                     <span className='text-xs text-ink-3'>{label}</span>
                   </div>
                 ))}

@@ -26,7 +26,9 @@ export function sourceFrames(project: Project, clip: Clip) {
 const shiftKeyframes = (keyframes: Clip['keyframes'], offset: number, length: number) => {
   const result: Clip['keyframes'] = {};
   for (const [prop, list] of Object.entries(keyframes) as [AnimProp, Keyframe[]][]) {
-    const kept = list.filter(k => k.frame >= offset && k.frame < offset + length).map(k => ({ ...k, frame: k.frame - offset }));
+    const kept = list
+      .filter(k => k.frame >= offset && k.frame < offset + length)
+      .map(k => ({ ...k, frame: k.frame - offset }));
     if (kept.length) result[prop] = kept;
   }
   return result;
@@ -292,7 +294,8 @@ export function pasteClips(project: Project, clips: Clip[], frame: number) {
       if (!links.has(source.linkId)) links.set(source.linkId, nanoid());
       clip.linkId = links.get(source.linkId)!;
     }
-    if (!project.tracks.some(t => t.id === clip.trackId)) clip.trackId = ensureTrack(project, clip.kind === 'audio' ? 'audio' : 'video').id;
+    if (!project.tracks.some(t => t.id === clip.trackId))
+      clip.trackId = ensureTrack(project, clip.kind === 'audio' ? 'audio' : 'video').id;
     placeClip(project, clip);
     return clip.id;
   });

@@ -20,7 +20,21 @@ interface ClipItemProps {
   selected: boolean;
 }
 
-function Filmstrip({ asset, clip, zoom, width, offset, fps }: { asset: Asset; clip: Clip; zoom: number; width: number; offset: number; fps: number }) {
+function Filmstrip({
+  asset,
+  clip,
+  zoom,
+  width,
+  offset,
+  fps,
+}: {
+  asset: Asset;
+  clip: Clip;
+  zoom: number;
+  width: number;
+  offset: number;
+  fps: number;
+}) {
   const [thumbs, setThumbs] = useState<Thumbs | null>(null);
   useEffect(() => {
     let alive = true;
@@ -54,7 +68,21 @@ function Filmstrip({ asset, clip, zoom, width, offset, fps }: { asset: Asset; cl
   );
 }
 
-function Waveform({ asset, clip, zoom, width, offset, fps }: { asset: Asset; clip: Clip; zoom: number; width: number; offset: number; fps: number }) {
+function Waveform({
+  asset,
+  clip,
+  zoom,
+  width,
+  offset,
+  fps,
+}: {
+  asset: Asset;
+  clip: Clip;
+  zoom: number;
+  width: number;
+  offset: number;
+  fps: number;
+}) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [peaks, setPeaks] = useState<Float32Array | null>(null);
   useEffect(() => {
@@ -90,10 +118,20 @@ function Waveform({ asset, clip, zoom, width, offset, fps }: { asset: Asset; cli
     }
   }, [peaks, zoom, width, offset, fps, clip]);
 
-  return <canvas ref={canvasRef} className='absolute bottom-0 left-0 h-full' style={{ width: Math.min(4096, width) }} />;
+  return (
+    <canvas ref={canvasRef} className='absolute bottom-0 left-0 h-full' style={{ width: Math.min(4096, width) }} />
+  );
 }
 
-export const ClipItem = memo(function ClipItem({ clip, project, height, zoom, viewStart, viewEnd, selected }: ClipItemProps) {
+export const ClipItem = memo(function ClipItem({
+  clip,
+  project,
+  height,
+  zoom,
+  viewStart,
+  viewEnd,
+  selected,
+}: ClipItemProps) {
   const drag = useDragStore(s => (s.drag?.ids.includes(clip.id) ? s.drag : null));
 
   let start = clip.start;
@@ -126,7 +164,9 @@ export const ClipItem = memo(function ClipItem({ clip, project, height, zoom, vi
   const tool = useUiStore(s => s.tool);
   const transition = clip.transitionIn;
 
-  const keyframeFrames = selected ? [...new Set(ANIMATABLE.flatMap(p => clip.keyframes[p]?.map(k => k.frame) ?? []))] : [];
+  const keyframeFrames = selected
+    ? [...new Set(ANIMATABLE.flatMap(p => clip.keyframes[p]?.map(k => k.frame) ?? []))]
+    : [];
 
   return (
     <div
@@ -136,33 +176,70 @@ export const ClipItem = memo(function ClipItem({ clip, project, height, zoom, vi
         'absolute top-0.5 overflow-hidden rounded-[4px] border select-none',
         selected ? 'z-10 border-white' : 'border-black/80',
         drag && 'opacity-80 shadow-lg',
-        tool === 'razor' ? 'cursor-crosshair' : tool === 'trim' ? 'cursor-ew-resize' : 'cursor-grab active:cursor-grabbing',
+        tool === 'razor'
+          ? 'cursor-crosshair'
+          : tool === 'trim'
+            ? 'cursor-ew-resize'
+            : 'cursor-grab active:cursor-grabbing',
       )}
-      style={{ left, width, height: height - 4, backgroundColor: CLIP_COLOR[clip.kind], translate: `0 ${translateY}px` }}
+      style={{
+        left,
+        width,
+        height: height - 4,
+        backgroundColor: CLIP_COLOR[clip.kind],
+        translate: `0 ${translateY}px`,
+      }}
     >
-      <div className='flex items-center gap-1 overflow-hidden bg-black/25 px-1.5 text-[10px] leading-none font-medium text-white/90' style={{ height: LABEL_HEIGHT }}>
+      <div
+        className='flex items-center gap-1 overflow-hidden bg-black/25 px-1.5 text-[10px] leading-none font-medium text-white/90'
+        style={{ height: LABEL_HEIGHT }}
+      >
         {clip.linkId && <Link2 className='size-2.5 shrink-0' />}
         {muted && <VolumeX className='size-2.5 shrink-0' />}
         {clip.kind === 'text' && <Type className='size-2.5 shrink-0' />}
         {clip.kind === 'shape' && <Square className='size-2.5 shrink-0' />}
         <span className='truncate'>{clip.kind === 'text' ? clip.text.content : clip.name}</span>
-        {(clip.kind === 'video' || clip.kind === 'audio') && clip.speed !== 1 && <span className='ml-auto shrink-0 text-white/60'>{clip.speed}×</span>}
+        {(clip.kind === 'video' || clip.kind === 'audio') && clip.speed !== 1 && (
+          <span className='ml-auto shrink-0 text-white/60'>{clip.speed}×</span>
+        )}
       </div>
       <div className='relative' style={{ height: bodyHeight }}>
         {visibleRight > visibleLeft && asset && (
-          <div className='absolute top-0 h-full' style={{ left: visibleLeft - left, width: visibleRight - visibleLeft }}>
+          <div
+            className='absolute top-0 h-full'
+            style={{ left: visibleLeft - left, width: visibleRight - visibleLeft }}
+          >
             {clip.kind === 'video' && (
-              <Filmstrip asset={asset} clip={clip} zoom={zoom} width={visibleRight - visibleLeft} offset={visibleLeft - left} fps={project.settings.fps} />
+              <Filmstrip
+                asset={asset}
+                clip={clip}
+                zoom={zoom}
+                width={visibleRight - visibleLeft}
+                offset={visibleLeft - left}
+                fps={project.settings.fps}
+              />
             )}
             {clip.kind === 'image' && (
-              <div className='absolute inset-0 bg-repeat-x opacity-80' style={{ backgroundImage: `url(${asset.src})`, backgroundSize: 'auto 100%' }} />
+              <div
+                className='absolute inset-0 bg-repeat-x opacity-80'
+                style={{ backgroundImage: `url(${asset.src})`, backgroundSize: 'auto 100%' }}
+              />
             )}
             {clip.kind === 'audio' && (
-              <Waveform asset={asset} clip={clip} zoom={zoom} width={visibleRight - visibleLeft} offset={visibleLeft - left} fps={project.settings.fps} />
+              <Waveform
+                asset={asset}
+                clip={clip}
+                zoom={zoom}
+                width={visibleRight - visibleLeft}
+                offset={visibleLeft - left}
+                fps={project.settings.fps}
+              />
             )}
           </div>
         )}
-        {clip.kind === 'text' && <div className='truncate px-1.5 pt-1 text-[11px] text-white/70'>{clip.text.caption ? 'Caption' : 'Text'}</div>}
+        {clip.kind === 'text' && (
+          <div className='truncate px-1.5 pt-1 text-[11px] text-white/70'>{clip.text.caption ? 'Caption' : 'Text'}</div>
+        )}
       </div>
 
       {transition && (
@@ -201,7 +278,10 @@ export const ClipItem = memo(function ClipItem({ clip, project, height, zoom, vi
                   if (!list) continue;
                   const k = list.find(x => x.frame === frame);
                   if (!k) continue;
-                  c.keyframes[prop] = [...list.filter(x => x !== k && x.frame !== target), { ...k, frame: target }].sort((a, b) => a.frame - b.frame);
+                  c.keyframes[prop] = [
+                    ...list.filter(x => x !== k && x.frame !== target),
+                    { ...k, frame: target },
+                  ].sort((a, b) => a.frame - b.frame);
                 }
               });
             };
@@ -213,8 +293,14 @@ export const ClipItem = memo(function ClipItem({ clip, project, height, zoom, vi
 
       {tool === 'select' && (
         <>
-          <div className='absolute top-0 left-0 z-10 h-full w-1.5 cursor-w-resize hover:bg-white/40' onPointerDown={e => beginClipGesture(e, clip.id, 'trim-start')} />
-          <div className='absolute top-0 right-0 z-10 h-full w-1.5 cursor-e-resize hover:bg-white/40' onPointerDown={e => beginClipGesture(e, clip.id, 'trim-end')} />
+          <div
+            className='absolute top-0 left-0 z-10 h-full w-1.5 cursor-w-resize hover:bg-white/40'
+            onPointerDown={e => beginClipGesture(e, clip.id, 'trim-start')}
+          />
+          <div
+            className='absolute top-0 right-0 z-10 h-full w-1.5 cursor-e-resize hover:bg-white/40'
+            onPointerDown={e => beginClipGesture(e, clip.id, 'trim-end')}
+          />
         </>
       )}
     </div>

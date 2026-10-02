@@ -55,7 +55,9 @@ export function PreviewPanel() {
   useEffect(() => {
     const el = containerRef.current;
     if (!el) return;
-    const observer = new ResizeObserver(([entry]) => setBox({ width: entry.contentRect.width, height: entry.contentRect.height }));
+    const observer = new ResizeObserver(([entry]) =>
+      setBox({ width: entry.contentRect.width, height: entry.contentRect.height }),
+    );
     observer.observe(el);
     return () => observer.disconnect();
   }, []);
@@ -69,7 +71,8 @@ export function PreviewPanel() {
     const onFrame = (e: { detail: { frame: number } }) => {
       setFrame(e.detail.frame);
       const { inPoint, outPoint } = useProjectStore.getState().project;
-      if (loopRef.current && player.isPlaying() && inPoint !== null && outPoint !== null && e.detail.frame >= outPoint) player.seekTo(inPoint);
+      if (loopRef.current && player.isPlaying() && inPoint !== null && outPoint !== null && e.detail.frame >= outPoint)
+        player.seekTo(inPoint);
     };
     const onPlay = () => setPlaying(true);
     const onPause = () => setPlaying(false);
@@ -133,7 +136,12 @@ export function PreviewPanel() {
           <IconButton label='Step backward' shortcut='←' onClick={() => stepFrames(-1)}>
             <StepBack />
           </IconButton>
-          <IconButton label={playing ? 'Pause' : 'Play'} shortcut='Space' onClick={togglePlay} className='size-8 [&_svg]:size-5'>
+          <IconButton
+            label={playing ? 'Pause' : 'Play'}
+            shortcut='Space'
+            onClick={togglePlay}
+            className='size-8 [&_svg]:size-5'
+          >
             {playing ? <Pause fill='currentColor' /> : <Play fill='currentColor' />}
           </IconButton>
           <IconButton label='Step forward' shortcut='→' onClick={() => stepFrames(1)}>

@@ -86,4 +86,3 @@ export function importUrl(url: string) {
     return finalize(job, info.filePath, info.fileName, kind, 0);
   });
 }
-

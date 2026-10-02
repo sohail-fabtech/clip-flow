@@ -11,9 +11,18 @@ import { toast } from '@/features/editor/ui/toasts';
 type Matcher = (e: KeyboardEvent, mod: boolean) => boolean;
 
 const is = (e: KeyboardEvent, ...keys: string[]) => keys.includes(e.key.toLowerCase()) || keys.includes(e.code);
-const plain = (...keys: string[]): Matcher => (e, mod) => is(e, ...keys) && !mod && !e.shiftKey && !e.altKey;
-const shifted = (k: string): Matcher => (e, mod) => is(e, k) && !mod && e.shiftKey && !e.altKey;
-const withMod = (k: string, shift = false): Matcher => (e, mod) => is(e, k) && mod && e.shiftKey === shift && !e.altKey;
+const plain =
+  (...keys: string[]): Matcher =>
+  (e, mod) =>
+    is(e, ...keys) && !mod && !e.shiftKey && !e.altKey;
+const shifted =
+  (k: string): Matcher =>
+  (e, mod) =>
+    is(e, k) && !mod && e.shiftKey && !e.altKey;
+const withMod =
+  (k: string, shift = false): Matcher =>
+  (e, mod) =>
+    is(e, k) && mod && e.shiftKey === shift && !e.altKey;
 const ui = () => useUiStore.getState();
 const fps = () => getProject().settings.fps;
 
@@ -49,10 +58,13 @@ export const BINDINGS: [Matcher, (e: KeyboardEvent) => void][] = [
   [(e, m) => (e.key === '=' || e.key === '+') && !m, () => ui().setZoom(ui().zoom * 1.5)],
   [(e, m) => e.key === '-' && !m, () => ui().setZoom(ui().zoom / 1.5)],
   [withMod('s'), () => saveProject(getProject()).then(() => toast('Project saved'))],
-  [withMod('i'), () => {
-    ui().setLeftTab('media');
-    setTimeout(openImport, 0);
-  }],
+  [
+    withMod('i'),
+    () => {
+      ui().setLeftTab('media');
+      setTimeout(openImport, 0);
+    },
+  ],
   [withMod('e'), () => ui().setExportOpen(true)],
   [withMod('e', true), captureStill],
   [withMod('z'), actions.undo],
@@ -62,10 +74,13 @@ export const BINDINGS: [Matcher, (e: KeyboardEvent) => void][] = [
   [withMod('v'), actions.paste],
   [withMod('d'), actions.duplicate],
   [withMod('a'), actions.selectAll],
-  [e => is(e, 'escape'), () => {
-    ui().select([]);
-    ui().setTool('select');
-  }],
+  [
+    e => is(e, 'escape'),
+    () => {
+      ui().select([]);
+      ui().setTool('select');
+    },
+  ],
   [e => e.key === '?', () => ui().setShortcutsOpen(true)],
 ];
 

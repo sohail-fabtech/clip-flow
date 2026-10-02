@@ -12,7 +12,10 @@ function Slider({
   const count = (props.value ?? props.defaultValue ?? [0]).length;
   return (
     <SliderPrimitive.Root
-      className={cn('relative flex h-4 w-full touch-none items-center select-none data-[disabled]:opacity-40', className)}
+      className={cn(
+        'relative flex h-4 w-full touch-none items-center select-none data-[disabled]:opacity-40',
+        className,
+      )}
       {...props}
     >
       <SliderPrimitive.Track className='relative h-1 grow overflow-hidden rounded-full bg-white/12' style={trackStyle}>

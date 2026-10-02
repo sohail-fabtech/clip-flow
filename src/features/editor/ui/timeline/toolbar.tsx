@@ -32,7 +32,8 @@ export function fitZoom(viewWidth: number) {
 export function TimelineToolbar({ viewWidth }: { viewWidth: number }) {
   const canUndo = useProjectStore(s => s.past.length > 0);
   const canRedo = useProjectStore(s => s.future.length > 0);
-  const { tool, setTool, snapping, toggleSnapping, linkedSelection, toggleLinkedSelection, zoom, setZoom } = useUiStore();
+  const { tool, setTool, snapping, toggleSnapping, linkedSelection, toggleLinkedSelection, zoom, setZoom } =
+    useUiStore();
 
   return (
     <div className='flex h-9 shrink-0 items-center gap-0.5 border-b border-line bg-surface px-2'>

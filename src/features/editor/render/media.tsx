@@ -18,7 +18,13 @@ const FILL: CSSProperties = { width: '100%', height: '100%', display: 'block', o
 
 const lutCache = new Map<string, Promise<CubeLut>>();
 const loadLut = (src: string) => {
-  if (!lutCache.has(src)) lutCache.set(src, fetch(src).then(r => r.text()).then(parseCube));
+  if (!lutCache.has(src))
+    lutCache.set(
+      src,
+      fetch(src)
+        .then(r => r.text())
+        .then(parseCube),
+    );
   return lutCache.get(src)!;
 };
 

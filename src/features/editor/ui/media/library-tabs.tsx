@@ -1,5 +1,18 @@
 import { useEffect, useRef, useState } from 'react';
-import { Bookmark, Circle, Download, FileUp, Loader2, Music, Pause, Play, Plus, Square, Trash2, Type } from 'lucide-react';
+import {
+  Bookmark,
+  Circle,
+  Download,
+  FileUp,
+  Loader2,
+  Music,
+  Pause,
+  Play,
+  Plus,
+  Square,
+  Trash2,
+  Type,
+} from 'lucide-react';
 import type { TextStyle, TransitionType } from '@/features/editor/model/types';
 import { defaultTextStyle } from '@/features/editor/model/defaults';
 import { clipEnd } from '@/features/editor/engine/edits';
@@ -60,7 +73,11 @@ export function AudioTab() {
               onClick={() => preview(track.src)}
               className='flex size-8 shrink-0 items-center justify-center rounded bg-[var(--clip-audio)]/50 text-white hover:bg-[var(--clip-audio)]'
             >
-              {playing === track.src ? <Pause className='size-3.5' fill='currentColor' /> : <Play className='size-3.5' fill='currentColor' />}
+              {playing === track.src ? (
+                <Pause className='size-3.5' fill='currentColor' />
+              ) : (
+                <Play className='size-3.5' fill='currentColor' />
+              )}
             </button>
             <div className='min-w-0 flex-1'>
               <div className='truncate text-xs text-ink-2'>{track.name}</div>
@@ -100,12 +117,65 @@ const TEXT_PRESETS: { label: string; content: string; style: Partial<TextStyle> 
   {
     label: 'Lower third',
     content: 'Name Surname',
-    style: { fontSize: 54, align: 'left', backgroundColor: '#000000cc', backgroundPadding: 24, backgroundRadius: 8, fontFamily: 'Roboto-Medium', fontUrl: '' },
+    style: {
+      fontSize: 54,
+      align: 'left',
+      backgroundColor: '#000000cc',
+      backgroundPadding: 24,
+      backgroundRadius: 8,
+      fontFamily: 'Roboto-Medium',
+      fontUrl: '',
+    },
   },
-  { label: 'Outline', content: 'OUTLINE', style: { fontSize: 120, color: '#00000000', strokeColor: '#ffffff', strokeWidth: 4, fontFamily: 'Anton-Regular', fontUrl: '' } },
-  { label: 'Shadow', content: 'Shadow', style: { fontSize: 110, shadowColor: '#000000', shadowY: 8, shadowBlur: 24, fontFamily: 'Poppins-Bold', fontUrl: '' } },
-  { label: 'Highlight', content: 'Highlight', style: { fontSize: 90, color: '#000000', backgroundColor: '#ffd900', backgroundPadding: 20, backgroundRadius: 6, fontFamily: 'Poppins-Bold', fontUrl: '' } },
-  { label: 'Neon', content: 'Neon', style: { fontSize: 120, color: '#ffffff', shadowColor: '#ff3df5', shadowBlur: 30, fontFamily: 'Pacifico-Regular', fontUrl: '' } },
+  {
+    label: 'Outline',
+    content: 'OUTLINE',
+    style: {
+      fontSize: 120,
+      color: '#00000000',
+      strokeColor: '#ffffff',
+      strokeWidth: 4,
+      fontFamily: 'Anton-Regular',
+      fontUrl: '',
+    },
+  },
+  {
+    label: 'Shadow',
+    content: 'Shadow',
+    style: {
+      fontSize: 110,
+      shadowColor: '#000000',
+      shadowY: 8,
+      shadowBlur: 24,
+      fontFamily: 'Poppins-Bold',
+      fontUrl: '',
+    },
+  },
+  {
+    label: 'Highlight',
+    content: 'Highlight',
+    style: {
+      fontSize: 90,
+      color: '#000000',
+      backgroundColor: '#ffd900',
+      backgroundPadding: 20,
+      backgroundRadius: 6,
+      fontFamily: 'Poppins-Bold',
+      fontUrl: '',
+    },
+  },
+  {
+    label: 'Neon',
+    content: 'Neon',
+    style: {
+      fontSize: 120,
+      color: '#ffffff',
+      shadowColor: '#ff3df5',
+      shadowBlur: 30,
+      fontFamily: 'Pacifico-Regular',
+      fontUrl: '',
+    },
+  },
 ];
 
 export function TextPresetsTab() {
@@ -116,7 +186,8 @@ export function TextPresetsTab() {
     const id = useUiStore.getState().selection[0];
     commit('Text preset', draft => {
       const clip = draft.clips[id];
-      if (clip?.kind === 'text') Object.assign(clip.text.style, preset.style, { fontFamily: font.postScriptName, fontUrl: font.url });
+      if (clip?.kind === 'text')
+        Object.assign(clip.text.style, preset.style, { fontFamily: font.postScriptName, fontUrl: font.url });
     });
   };
 
@@ -139,7 +210,11 @@ export function TextPresetsTab() {
           >
             <span
               className='max-w-full truncate px-1'
-              style={{ ...textCss({ ...defaultTextStyle(), ...preset.style, fontSize: 20 }), fontFamily: 'ui-sans-serif', whiteSpace: 'nowrap' }}
+              style={{
+                ...textCss({ ...defaultTextStyle(), ...preset.style, fontSize: 20 }),
+                fontFamily: 'ui-sans-serif',
+                whiteSpace: 'nowrap',
+              }}
             >
               {preset.content}
             </span>
@@ -152,11 +227,45 @@ export function TextPresetsTab() {
 }
 
 const CAPTION_STYLES: { label: string; style: Partial<TextStyle> }[] = [
-  { label: 'Classic', style: { color: '#ffffff', strokeWidth: 0, backgroundColor: '#000000aa', backgroundPadding: 14, shadowBlur: 0 } },
-  { label: 'Bold outline', style: { color: '#ffffff', strokeColor: '#000000', strokeWidth: 6, backgroundColor: 'transparent', uppercase: true } },
-  { label: 'Yellow', style: { color: '#ffd900', strokeColor: '#000000', strokeWidth: 5, backgroundColor: 'transparent' } },
-  { label: 'Boxed', style: { color: '#000000', backgroundColor: '#ffffff', backgroundPadding: 16, backgroundRadius: 10, strokeWidth: 0 } },
-  { label: 'Soft shadow', style: { color: '#ffffff', strokeWidth: 0, backgroundColor: 'transparent', shadowColor: '#000000', shadowY: 4, shadowBlur: 18 } },
+  {
+    label: 'Classic',
+    style: { color: '#ffffff', strokeWidth: 0, backgroundColor: '#000000aa', backgroundPadding: 14, shadowBlur: 0 },
+  },
+  {
+    label: 'Bold outline',
+    style: {
+      color: '#ffffff',
+      strokeColor: '#000000',
+      strokeWidth: 6,
+      backgroundColor: 'transparent',
+      uppercase: true,
+    },
+  },
+  {
+    label: 'Yellow',
+    style: { color: '#ffd900', strokeColor: '#000000', strokeWidth: 5, backgroundColor: 'transparent' },
+  },
+  {
+    label: 'Boxed',
+    style: {
+      color: '#000000',
+      backgroundColor: '#ffffff',
+      backgroundPadding: 16,
+      backgroundRadius: 10,
+      strokeWidth: 0,
+    },
+  },
+  {
+    label: 'Soft shadow',
+    style: {
+      color: '#ffffff',
+      strokeWidth: 0,
+      backgroundColor: 'transparent',
+      shadowColor: '#000000',
+      shadowY: 4,
+      shadowBlur: 18,
+    },
+  },
 ];
 
 export function CaptionsTab() {
@@ -170,7 +279,8 @@ export function CaptionsTab() {
 
   const applyStyle = (style: Partial<TextStyle>) =>
     commit('Caption style', draft => {
-      for (const c of Object.values(draft.clips)) if (c.kind === 'text' && c.text.caption) Object.assign(c.text.style, style);
+      for (const c of Object.values(draft.clips))
+        if (c.kind === 'text' && c.text.caption) Object.assign(c.text.style, style);
     });
 
   const closeGaps = () =>
@@ -180,7 +290,8 @@ export function CaptionsTab() {
         .sort((a, b) => a.start - b.start);
       for (let i = 0; i < list.length - 1; i++) {
         const space = list[i + 1].start - clipEnd(list[i]);
-        if (space > 0 && space <= gap * draft.settings.fps && list[i].trackId === list[i + 1].trackId) list[i].duration += space;
+        if (space > 0 && space <= gap * draft.settings.fps && list[i].trackId === list[i + 1].trackId)
+          list[i].duration += space;
       }
     });
 
@@ -208,16 +319,32 @@ export function CaptionsTab() {
         }}
       />
       <div className='grid grid-cols-2 gap-1.5 border-b border-line-subtle p-2'>
-        <button type='button' onClick={() => actions.addText('Caption', true)} className='flex h-8 items-center justify-center gap-1.5 rounded-md bg-white/10 text-xs hover:bg-white/15'>
+        <button
+          type='button'
+          onClick={() => actions.addText('Caption', true)}
+          className='flex h-8 items-center justify-center gap-1.5 rounded-md bg-white/10 text-xs hover:bg-white/15'
+        >
           <Plus className='size-3.5' /> Add caption
         </button>
-        <button type='button' onClick={() => fileRef.current?.click()} className='flex h-8 items-center justify-center gap-1.5 rounded-md bg-white/10 text-xs hover:bg-white/15'>
+        <button
+          type='button'
+          onClick={() => fileRef.current?.click()}
+          className='flex h-8 items-center justify-center gap-1.5 rounded-md bg-white/10 text-xs hover:bg-white/15'
+        >
           <FileUp className='size-3.5' /> Import SRT/VTT
         </button>
-        <button type='button' onClick={() => exportFile('srt')} className='flex h-7 items-center justify-center gap-1.5 rounded-md text-[11px] text-ink-3 hover:bg-white/8'>
+        <button
+          type='button'
+          onClick={() => exportFile('srt')}
+          className='flex h-7 items-center justify-center gap-1.5 rounded-md text-[11px] text-ink-3 hover:bg-white/8'
+        >
           <Download className='size-3.5' /> Export SRT
         </button>
-        <button type='button' onClick={() => exportFile('vtt')} className='flex h-7 items-center justify-center gap-1.5 rounded-md text-[11px] text-ink-3 hover:bg-white/8'>
+        <button
+          type='button'
+          onClick={() => exportFile('vtt')}
+          className='flex h-7 items-center justify-center gap-1.5 rounded-md text-[11px] text-ink-3 hover:bg-white/8'
+        >
           <Download className='size-3.5' /> Export VTT
         </button>
       </div>
@@ -230,7 +357,15 @@ export function CaptionsTab() {
             disabled={!captions.length}
             onClick={() => applyStyle(preset.style)}
             className='rounded-md border border-line bg-[#111214] px-2 py-1.5 text-[11px] hover:border-line-strong disabled:opacity-40'
-            style={{ ...textCss({ ...defaultTextStyle(), ...preset.style, fontSize: 12, strokeWidth: Math.min(1, preset.style.strokeWidth ?? 0) }), fontFamily: 'ui-sans-serif' }}
+            style={{
+              ...textCss({
+                ...defaultTextStyle(),
+                ...preset.style,
+                fontSize: 12,
+                strokeWidth: Math.min(1, preset.style.strokeWidth ?? 0),
+              }),
+              fontFamily: 'ui-sans-serif',
+            }}
           >
             {preset.label}
           </button>
@@ -250,13 +385,22 @@ export function CaptionsTab() {
           className='h-6 w-14 rounded border border-line bg-base px-1 text-xs'
         />
         <span className='text-[11px] text-ink-4'>s</span>
-        <button type='button' onClick={closeGaps} disabled={captions.length < 2} className='ml-auto rounded px-2 py-1 text-[11px] text-selection hover:bg-white/5 disabled:opacity-40'>
+        <button
+          type='button'
+          onClick={closeGaps}
+          disabled={captions.length < 2}
+          className='ml-auto rounded px-2 py-1 text-[11px] text-selection hover:bg-white/5 disabled:opacity-40'
+        >
           Apply
         </button>
       </div>
       <SectionLabel>Captions ({captions.length})</SectionLabel>
       <div className='min-h-0 flex-1 space-y-1 overflow-y-auto px-2 pb-2'>
-        {captions.length === 0 && <EmptyState icon={<Type />} title='No captions'>Add captions manually or import an SRT/VTT file.</EmptyState>}
+        {captions.length === 0 && (
+          <EmptyState icon={<Type />} title='No captions'>
+            Add captions manually or import an SRT/VTT file.
+          </EmptyState>
+        )}
         {captions.map(c =>
           c.kind === 'text' ? (
             <div key={c.id} className='rounded-md bg-base p-1.5'>
@@ -329,13 +473,18 @@ export function TransitionsTab() {
             className='group flex h-16 flex-col items-center justify-center gap-1.5 rounded-md border border-line bg-[#111214] text-[11px] text-ink-3 hover:border-line-strong hover:text-ink'
           >
             <span className='relative h-5 w-9 overflow-hidden rounded-sm bg-[var(--clip-video)]'>
-              <span className='absolute inset-0 bg-[var(--clip-image)] transition-all duration-500 group-hover:translate-x-0' style={{ translate: '50% 0' }} />
+              <span
+                className='absolute inset-0 bg-[var(--clip-image)] transition-all duration-500 group-hover:translate-x-0'
+                style={{ translate: '50% 0' }}
+              />
             </span>
             {t.label}
           </button>
         ))}
       </div>
-      <p className='mt-3 text-[11px] leading-relaxed text-ink-4'>Drag a transition onto a cut between two clips, or select the second clip and click a transition.</p>
+      <p className='mt-3 text-[11px] leading-relaxed text-ink-4'>
+        Drag a transition onto a cut between two clips, or select the second clip and click a transition.
+      </p>
     </div>
   );
 }
@@ -345,10 +494,18 @@ export function ElementsTab() {
     <div className='min-h-0 flex-1 overflow-y-auto p-2'>
       <SectionLabel>Shapes</SectionLabel>
       <div className='grid grid-cols-3 gap-1.5'>
-        <button type='button' onClick={() => actions.addShape('rectangle')} className='flex aspect-square flex-col items-center justify-center gap-1 rounded-md border border-line bg-[#111214] text-[11px] text-ink-3 hover:border-line-strong'>
+        <button
+          type='button'
+          onClick={() => actions.addShape('rectangle')}
+          className='flex aspect-square flex-col items-center justify-center gap-1 rounded-md border border-line bg-[#111214] text-[11px] text-ink-3 hover:border-line-strong'
+        >
           <Square className='size-6' /> Rectangle
         </button>
-        <button type='button' onClick={() => actions.addShape('ellipse')} className='flex aspect-square flex-col items-center justify-center gap-1 rounded-md border border-line bg-[#111214] text-[11px] text-ink-3 hover:border-line-strong'>
+        <button
+          type='button'
+          onClick={() => actions.addShape('ellipse')}
+          className='flex aspect-square flex-col items-center justify-center gap-1 rounded-md border border-line bg-[#111214] text-[11px] text-ink-3 hover:border-line-strong'
+        >
           <Circle className='size-6' /> Ellipse
         </button>
         <button
@@ -375,7 +532,21 @@ export function ElementsTab() {
   );
 }
 
-const MARKER_COLORS = ['#4094FF', '#40CCE6', '#40BF5C', '#F2C72E', '#FF8C26', '#E64040', '#F259A6', '#A666F2', '#8CBFFF', '#73E6B8', '#A6D936', '#C79E6B', '#D1D1D1'];
+const MARKER_COLORS = [
+  '#4094FF',
+  '#40CCE6',
+  '#40BF5C',
+  '#F2C72E',
+  '#FF8C26',
+  '#E64040',
+  '#F259A6',
+  '#A666F2',
+  '#8CBFFF',
+  '#73E6B8',
+  '#A6D936',
+  '#C79E6B',
+  '#D1D1D1',
+];
 
 export function MarkersTab() {
   const markers = useProjectStore(s => s.project.markers);
@@ -391,14 +562,25 @@ export function MarkersTab() {
   return (
     <div className='flex min-h-0 flex-1 flex-col'>
       <div className='border-b border-line-subtle p-2'>
-        <button type='button' onClick={actions.addMarker} className='flex h-8 w-full items-center justify-center gap-1.5 rounded-md bg-white/10 text-xs hover:bg-white/15'>
+        <button
+          type='button'
+          onClick={actions.addMarker}
+          className='flex h-8 w-full items-center justify-center gap-1.5 rounded-md bg-white/10 text-xs hover:bg-white/15'
+        >
           <Bookmark className='size-3.5' /> Add marker at {timecode(frame, fps)}
         </button>
       </div>
       <div className='min-h-0 flex-1 space-y-1 overflow-y-auto p-2'>
-        {markers.length === 0 && <EmptyState icon={<Bookmark />} title='No markers'>Press M to drop a marker at the playhead.</EmptyState>}
+        {markers.length === 0 && (
+          <EmptyState icon={<Bookmark />} title='No markers'>
+            Press M to drop a marker at the playhead.
+          </EmptyState>
+        )}
         {markers.map(marker => (
-          <div key={marker.id} className={cn('rounded-md bg-base p-2', selectedId === marker.id && 'ring-1 ring-selection')}>
+          <div
+            key={marker.id}
+            className={cn('rounded-md bg-base p-2', selectedId === marker.id && 'ring-1 ring-selection')}
+          >
             <div className='flex items-center gap-2'>
               <span className='size-2.5 shrink-0 rounded-full' style={{ background: marker.color }} />
               <input
@@ -406,13 +588,28 @@ export function MarkersTab() {
                 key={marker.name}
                 aria-label='Marker name'
                 onKeyDown={e => e.stopPropagation()}
-                onBlur={e => e.target.value !== marker.name && update(marker.id, { name: e.target.value.slice(0, 120) })}
+                onBlur={e =>
+                  e.target.value !== marker.name && update(marker.id, { name: e.target.value.slice(0, 120) })
+                }
                 className='min-w-0 flex-1 bg-transparent text-xs text-ink outline-none'
               />
-              <button type='button' onClick={() => { seek(marker.frame); useUiStore.getState().selectMarker(marker.id); }} className='font-mono text-[10px] text-timecode'>
+              <button
+                type='button'
+                onClick={() => {
+                  seek(marker.frame);
+                  useUiStore.getState().selectMarker(marker.id);
+                }}
+                className='font-mono text-[10px] text-timecode'
+              >
                 {timecode(marker.frame, fps)}
               </button>
-              <IconButton label='Delete marker' className='size-5 [&_svg]:size-3' onClick={() => commit('Delete marker', d => void (d.markers = d.markers.filter(m => m.id !== marker.id)))}>
+              <IconButton
+                label='Delete marker'
+                className='size-5 [&_svg]:size-3'
+                onClick={() =>
+                  commit('Delete marker', d => void (d.markers = d.markers.filter(m => m.id !== marker.id)))
+                }
+              >
                 <Trash2 />
               </IconButton>
             </div>
@@ -420,7 +617,14 @@ export function MarkersTab() {
               <div className='mt-2 space-y-2'>
                 <div className='flex flex-wrap gap-1'>
                   {MARKER_COLORS.map(color => (
-                    <button key={color} type='button' aria-label={`Color ${color}`} onClick={() => update(marker.id, { color })} className={cn('size-4 rounded-full', marker.color === color && 'ring-2 ring-white')} style={{ background: color }} />
+                    <button
+                      key={color}
+                      type='button'
+                      aria-label={`Color ${color}`}
+                      onClick={() => update(marker.id, { color })}
+                      className={cn('size-4 rounded-full', marker.color === color && 'ring-2 ring-white')}
+                      style={{ background: color }}
+                    />
                   ))}
                 </div>
                 <div className='flex items-center gap-2 text-[11px] text-ink-3'>
@@ -454,4 +658,3 @@ export function MarkersTab() {
     </div>
   );
 }
-

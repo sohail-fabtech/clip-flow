@@ -46,7 +46,11 @@ export function Ruler({ project, zoom, width, scrollLeft, viewWidth }: RulerProp
       if (isMajor) {
         ctx.fillStyle = 'rgba(255,255,255,0.55)';
         const frame = Math.round(t * fps);
-        ctx.fillText(major < 1 ? `${shortTime(frame, fps)}:${String(frame % fps).padStart(2, '0')}` : shortTime(frame, fps), x + 4, 5);
+        ctx.fillText(
+          major < 1 ? `${shortTime(frame, fps)}:${String(frame % fps).padStart(2, '0')}` : shortTime(frame, fps),
+          x + 4,
+          5,
+        );
       }
     }
   }, [zoom, fps, scrollLeft, viewWidth]);
@@ -83,7 +87,11 @@ export function Ruler({ project, zoom, width, scrollLeft, viewWidth }: RulerProp
         };
       }}
     >
-      <canvas ref={canvasRef} className='pointer-events-none sticky block' style={{ left: HEADER_WIDTH, width: viewWidth, height: RULER_HEIGHT }} />
+      <canvas
+        ref={canvasRef}
+        className='pointer-events-none sticky block'
+        style={{ left: HEADER_WIDTH, width: viewWidth, height: RULER_HEIGHT }}
+      />
       {project.inPoint !== null && project.outPoint !== null && (
         <div
           className='pointer-events-none absolute bottom-0 h-1 bg-timecode/80'
@@ -118,10 +126,18 @@ export function Ruler({ project, zoom, width, scrollLeft, viewWidth }: RulerProp
           }}
         >
           <svg width='10' height='12' viewBox='0 0 10 12'>
-            <path d='M0 0h10v8l-5 4-5-4z' fill={marker.color} stroke={selectedMarker === marker.id ? '#fff' : '#000'} strokeWidth='1' />
+            <path
+              d='M0 0h10v8l-5 4-5-4z'
+              fill={marker.color}
+              stroke={selectedMarker === marker.id ? '#fff' : '#000'}
+              strokeWidth='1'
+            />
           </svg>
           {marker.duration > 0 && (
-            <span className='absolute top-0 left-1/2 h-1 opacity-70' style={{ width: marker.duration * zoom, background: marker.color }} />
+            <span
+              className='absolute top-0 left-1/2 h-1 opacity-70'
+              style={{ width: marker.duration * zoom, background: marker.color }}
+            />
           )}
         </button>
       ))}

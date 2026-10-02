@@ -7,7 +7,17 @@ import { cn } from '@/lib/utils';
 export const isMac = () => typeof navigator !== 'undefined' && /Mac|iPhone|iPad/.test(navigator.platform);
 export const mod = (key: string) => (isMac() ? `⌘${key}` : `Ctrl+${key}`);
 
-export function Hint({ label, shortcut, children, side = 'bottom' }: { label: string; shortcut?: string; children: ReactNode; side?: 'top' | 'bottom' | 'left' | 'right' }) {
+export function Hint({
+  label,
+  shortcut,
+  children,
+  side = 'bottom',
+}: {
+  label: string;
+  shortcut?: string;
+  children: ReactNode;
+  side?: 'top' | 'bottom' | 'left' | 'right';
+}) {
   return (
     <Tooltip delayDuration={400}>
       <TooltipTrigger asChild>{children}</TooltipTrigger>
@@ -19,7 +29,12 @@ export function Hint({ label, shortcut, children, side = 'bottom' }: { label: st
   );
 }
 
-type IconButtonProps = ComponentProps<'button'> & { label: string; shortcut?: string; active?: boolean; side?: 'top' | 'bottom' | 'left' | 'right' };
+type IconButtonProps = ComponentProps<'button'> & {
+  label: string;
+  shortcut?: string;
+  active?: boolean;
+  side?: 'top' | 'bottom' | 'left' | 'right';
+};
 
 export function IconButton({ label, shortcut, active, className, children, side, ...props }: IconButtonProps) {
   return (
@@ -51,7 +66,9 @@ export function PanelHeader({ title, children }: { title: ReactNode; children?: 
 }
 
 export function SectionLabel({ children }: { children: ReactNode }) {
-  return <div className='px-3 pt-3 pb-1.5 text-[10px] font-semibold tracking-wider text-ink-4 uppercase'>{children}</div>;
+  return (
+    <div className='px-3 pt-3 pb-1.5 text-[10px] font-semibold tracking-wider text-ink-4 uppercase'>{children}</div>
+  );
 }
 
 interface GroupProps {
@@ -82,9 +99,15 @@ export function Group({ title, children, defaultOpen = true, enabled, onEnabledC
             <RotateCcw />
           </IconButton>
         )}
-        {onEnabledChange && <Switch checked={enabled} onCheckedChange={onEnabledChange} aria-label={`Enable ${title}`} />}
+        {onEnabledChange && (
+          <Switch checked={enabled} onCheckedChange={onEnabledChange} aria-label={`Enable ${title}`} />
+        )}
       </div>
-      {open && <div className={cn('space-y-1 px-3 pb-3', enabled === false && 'pointer-events-none opacity-40')}>{children}</div>}
+      {open && (
+        <div className={cn('space-y-1 px-3 pb-3', enabled === false && 'pointer-events-none opacity-40')}>
+          {children}
+        </div>
+      )}
     </section>
   );
 }
@@ -112,7 +135,18 @@ interface ScrubProps {
   label?: string;
 }
 
-export function ScrubNumber({ value, onChange, onCommit, min = -Infinity, max = Infinity, step = 1, precision = 0, unit, className, label }: ScrubProps) {
+export function ScrubNumber({
+  value,
+  onChange,
+  onCommit,
+  min = -Infinity,
+  max = Infinity,
+  step = 1,
+  precision = 0,
+  unit,
+  className,
+  label,
+}: ScrubProps) {
   const [editing, setEditing] = useState<string | null>(null);
   const drag = useRef<{ x: number; start: number; moved: boolean; last: number } | null>(null);
   const clamp = (v: number) => Math.min(max, Math.max(min, v));
@@ -128,7 +162,10 @@ export function ScrubNumber({ value, onChange, onCommit, min = -Infinity, max = 
       <input
         autoFocus
         aria-label={label}
-        className={cn('h-6 w-16 rounded border border-selection/60 bg-base px-1.5 text-right font-mono text-xs text-ink outline-none', className)}
+        className={cn(
+          'h-6 w-16 rounded border border-selection/60 bg-base px-1.5 text-right font-mono text-xs text-ink outline-none',
+          className,
+        )}
         value={editing}
         onChange={e => setEditing(e.target.value)}
         onBlur={finish}
@@ -182,14 +219,27 @@ export function KeyframeToggle({ active, has, onToggle }: { active: boolean; has
     <IconButton
       label={active ? 'Remove keyframe' : 'Add keyframe'}
       onClick={onToggle}
-      className={cn('size-5 [&_svg]:size-3', has ? 'text-timecode' : 'text-ink-4 opacity-0 group-hover/row:opacity-100')}
+      className={cn(
+        'size-5 [&_svg]:size-3',
+        has ? 'text-timecode' : 'text-ink-4 opacity-0 group-hover/row:opacity-100',
+      )}
     >
       <Diamond fill={active ? 'currentColor' : 'none'} />
     </IconButton>
   );
 }
 
-export function SelectRow<T extends string>({ value, options, onChange, label }: { value: T; options: { value: T; label: string }[]; onChange: (value: T) => void; label: string }) {
+export function SelectRow<T extends string>({
+  value,
+  options,
+  onChange,
+  label,
+}: {
+  value: T;
+  options: { value: T; label: string }[];
+  onChange: (value: T) => void;
+  label: string;
+}) {
   return (
     <select
       aria-label={label}

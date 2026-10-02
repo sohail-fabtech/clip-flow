@@ -82,11 +82,13 @@ export async function computeThumbs(src: string, durationSec: number): Promise<T
       await once(video, 'seeked');
       context.drawImage(video, 0, 0, width, THUMB_HEIGHT);
       const blob = await canvas.convertToBlob({ type: 'image/jpeg', quality: 0.7 });
-      frames.push(await new Promise<string>(resolve => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result as string);
-        reader.readAsDataURL(blob);
-      }));
+      frames.push(
+        await new Promise<string>(resolve => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result as string);
+          reader.readAsDataURL(blob);
+        }),
+      );
     }
     video.removeAttribute('src');
     video.load();

@@ -45,7 +45,12 @@ export const useProjectStore = create<ProjectStore>((set, get) => ({
       draft.updatedAt = Date.now();
     });
     if (redo.length === 0) return;
-    set(state => ({ project, past: push(state.past, { label, redo, undo }), future: [], revision: state.revision + 1 }));
+    set(state => ({
+      project,
+      past: push(state.past, { label, redo, undo }),
+      future: [],
+      revision: state.revision + 1,
+    }));
   },
 
   begin: label => set({ pending: { label, redo: [], undo: [] } }),

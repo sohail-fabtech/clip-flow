@@ -100,7 +100,9 @@ export default function EditorShell({ projectId }: { projectId: string }) {
       <div className='flex h-dvh flex-col items-center justify-center gap-3 p-6 text-center'>
         <MonitorSmartphone className='size-8 text-ink-4' />
         <div className='text-sm font-medium'>Use a larger screen</div>
-        <p className='max-w-xs text-xs text-ink-3'>The editor needs a window at least 1024px wide. Widen the window or open it on a desktop.</p>
+        <p className='max-w-xs text-xs text-ink-3'>
+          The editor needs a window at least 1024px wide. Widen the window or open it on a desktop.
+        </p>
       </div>
     );
   }

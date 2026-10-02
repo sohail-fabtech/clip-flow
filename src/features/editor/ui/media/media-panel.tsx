@@ -2,7 +2,14 @@ import { Bookmark, Captions, Clapperboard, Music, Shapes, Shuffle, Type } from '
 import { useUiStore, type LeftTab } from '@/features/editor/store/ui-store';
 import { Hint, PanelHeader } from '@/features/editor/ui/common';
 import { MediaTab } from '@/features/editor/ui/media/media-tab';
-import { AudioTab, CaptionsTab, ElementsTab, MarkersTab, TextPresetsTab, TransitionsTab } from '@/features/editor/ui/media/library-tabs';
+import {
+  AudioTab,
+  CaptionsTab,
+  ElementsTab,
+  MarkersTab,
+  TextPresetsTab,
+  TransitionsTab,
+} from '@/features/editor/ui/media/library-tabs';
 import { cn } from '@/lib/utils';
 
 const TABS: { id: LeftTab; label: string; icon: typeof Music; content: () => React.ReactNode }[] = [
@@ -23,7 +30,11 @@ export function MediaPanel() {
 
   return (
     <div className='flex h-full bg-surface' role='region' aria-label='Media panel'>
-      <nav className='flex w-11 shrink-0 flex-col items-center gap-1 border-r border-line-subtle py-2' role='tablist' aria-orientation='vertical'>
+      <nav
+        className='flex w-11 shrink-0 flex-col items-center gap-1 border-r border-line-subtle py-2'
+        role='tablist'
+        aria-orientation='vertical'
+      >
         {TABS.map(({ id, label, icon: Icon }) => (
           <Hint key={id} label={label} side='right'>
             <button

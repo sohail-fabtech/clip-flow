@@ -59,7 +59,11 @@ export function TextTab({ clips }: { clips: Clip[] }) {
           onKeyDown={e => e.stopPropagation()}
           className='w-full resize-y rounded-md border border-line bg-base px-2 py-1.5 text-xs text-ink outline-none focus:border-selection/60'
         />
-        <ToggleRow label='Caption' checked={caption} onChange={on => set('Caption', text => void (text.caption = on))} />
+        <ToggleRow
+          label='Caption'
+          checked={caption}
+          onChange={on => set('Caption', text => void (text.caption = on))}
+        />
       </Group>
 
       <Group title='Text'>
@@ -82,18 +86,37 @@ export function TextTab({ clips }: { clips: Clip[] }) {
             onChange={chooseFont}
           />
         </Row>
-        <NumberRow label='Size' value={style.fontSize} min={4} max={1000} unit='px' onChange={(v, p) => setStyle('fontSize', v, p)} />
+        <NumberRow
+          label='Size'
+          value={style.fontSize}
+          min={4}
+          max={1000}
+          unit='px'
+          onChange={(v, p) => setStyle('fontSize', v, p)}
+        />
         <Row label='Format'>
-          <IconButton label='Bold' active={style.fontWeight >= 700} onClick={() => setStyle('fontWeight', style.fontWeight >= 700 ? 400 : 700)}>
+          <IconButton
+            label='Bold'
+            active={style.fontWeight >= 700}
+            onClick={() => setStyle('fontWeight', style.fontWeight >= 700 ? 400 : 700)}
+          >
             <Bold />
           </IconButton>
           <IconButton label='Italic' active={style.italic} onClick={() => setStyle('italic', !style.italic)}>
             <Italic />
           </IconButton>
-          <IconButton label='Underline' active={style.underline} onClick={() => setStyle('underline', !style.underline)}>
+          <IconButton
+            label='Underline'
+            active={style.underline}
+            onClick={() => setStyle('underline', !style.underline)}
+          >
             <Underline />
           </IconButton>
-          <IconButton label='Uppercase' active={style.uppercase} onClick={() => setStyle('uppercase', !style.uppercase)}>
+          <IconButton
+            label='Uppercase'
+            active={style.uppercase}
+            onClick={() => setStyle('uppercase', !style.uppercase)}
+          >
             <CaseUpper />
           </IconButton>
         </Row>
@@ -105,37 +128,127 @@ export function TextTab({ clips }: { clips: Clip[] }) {
               ['right', AlignRight],
             ] as const
           ).map(([align, Icon]) => (
-            <IconButton key={align} label={`Align ${align}`} active={style.align === align} onClick={() => setStyle('align', align)}>
+            <IconButton
+              key={align}
+              label={`Align ${align}`}
+              active={style.align === align}
+              onClick={() => setStyle('align', align)}
+            >
               <Icon />
             </IconButton>
           ))}
         </Row>
-        <NumberRow label='Line height' value={style.lineHeight} min={0.5} max={4} step={0.05} precision={2} onChange={(v, p) => setStyle('lineHeight', v, p)} />
-        <NumberRow label='Letter spacing' value={style.letterSpacing} min={-50} max={200} step={0.5} precision={1} unit='px' onChange={(v, p) => setStyle('letterSpacing', v, p)} />
-        <SliderRow label='Box width' min={0.1} max={1} value={style.maxWidth} unit='%' reset={0.9} onChange={(v, p) => setStyle('maxWidth', v, p)} />
-        <NumberRow label='Tilt' value={style.tilt} min={-80} max={80} unit='°' onChange={(v, p) => setStyle('tilt', v, p)} />
+        <NumberRow
+          label='Line height'
+          value={style.lineHeight}
+          min={0.5}
+          max={4}
+          step={0.05}
+          precision={2}
+          onChange={(v, p) => setStyle('lineHeight', v, p)}
+        />
+        <NumberRow
+          label='Letter spacing'
+          value={style.letterSpacing}
+          min={-50}
+          max={200}
+          step={0.5}
+          precision={1}
+          unit='px'
+          onChange={(v, p) => setStyle('letterSpacing', v, p)}
+        />
+        <SliderRow
+          label='Box width'
+          min={0.1}
+          max={1}
+          value={style.maxWidth}
+          unit='%'
+          reset={0.9}
+          onChange={(v, p) => setStyle('maxWidth', v, p)}
+        />
+        <NumberRow
+          label='Tilt'
+          value={style.tilt}
+          min={-80}
+          max={80}
+          unit='°'
+          onChange={(v, p) => setStyle('tilt', v, p)}
+        />
       </Group>
 
       <Group title='Fill & Stroke'>
         <ColorRow label='Fill' value={style.color} onChange={v => setStyle('color', v)} />
         <ColorRow label='Stroke' value={style.strokeColor} onChange={v => setStyle('strokeColor', v)} />
-        <NumberRow label='Stroke width' value={style.strokeWidth} min={0} max={60} step={0.5} precision={1} unit='px' onChange={(v, p) => setStyle('strokeWidth', v, p)} />
+        <NumberRow
+          label='Stroke width'
+          value={style.strokeWidth}
+          min={0}
+          max={60}
+          step={0.5}
+          precision={1}
+          unit='px'
+          onChange={(v, p) => setStyle('strokeWidth', v, p)}
+        />
         <SubLabel>Background</SubLabel>
         <ColorRow label='Color' value={style.backgroundColor} onChange={v => setStyle('backgroundColor', v)} />
-        <NumberRow label='Padding' value={style.backgroundPadding} min={0} max={200} unit='px' onChange={(v, p) => setStyle('backgroundPadding', v, p)} />
-        <NumberRow label='Radius' value={style.backgroundRadius} min={0} max={200} unit='px' onChange={(v, p) => setStyle('backgroundRadius', v, p)} />
+        <NumberRow
+          label='Padding'
+          value={style.backgroundPadding}
+          min={0}
+          max={200}
+          unit='px'
+          onChange={(v, p) => setStyle('backgroundPadding', v, p)}
+        />
+        <NumberRow
+          label='Radius'
+          value={style.backgroundRadius}
+          min={0}
+          max={200}
+          unit='px'
+          onChange={(v, p) => setStyle('backgroundRadius', v, p)}
+        />
         <SubLabel>Shadow</SubLabel>
         <ColorRow label='Color' value={style.shadowColor} onChange={v => setStyle('shadowColor', v)} />
-        <NumberRow label='Offset X' value={style.shadowX} min={-200} max={200} unit='px' onChange={(v, p) => setStyle('shadowX', v, p)} />
-        <NumberRow label='Offset Y' value={style.shadowY} min={-200} max={200} unit='px' onChange={(v, p) => setStyle('shadowY', v, p)} />
-        <NumberRow label='Blur' value={style.shadowBlur} min={0} max={200} unit='px' onChange={(v, p) => setStyle('shadowBlur', v, p)} />
+        <NumberRow
+          label='Offset X'
+          value={style.shadowX}
+          min={-200}
+          max={200}
+          unit='px'
+          onChange={(v, p) => setStyle('shadowX', v, p)}
+        />
+        <NumberRow
+          label='Offset Y'
+          value={style.shadowY}
+          min={-200}
+          max={200}
+          unit='px'
+          onChange={(v, p) => setStyle('shadowY', v, p)}
+        />
+        <NumberRow
+          label='Blur'
+          value={style.shadowBlur}
+          min={0}
+          max={200}
+          unit='px'
+          onChange={(v, p) => setStyle('shadowBlur', v, p)}
+        />
       </Group>
 
       <Group title='Layout'>
         <AnimRow label='Position X' prop='x' clips={texts} unit='px' />
         <AnimRow label='Position Y' prop='y' clips={texts} unit='px' />
         <AnimRow label='Rotation' prop='rotation' clips={texts} precision={1} step={0.5} unit='°' />
-        <AnimRow label='Opacity' prop='opacity' clips={texts} toDisplay={v => v * 100} fromDisplay={v => v / 100} min={0} max={100} unit='%' />
+        <AnimRow
+          label='Opacity'
+          prop='opacity'
+          clips={texts}
+          toDisplay={v => v * 100}
+          fromDisplay={v => v / 100}
+          min={0}
+          max={100}
+          unit='%'
+        />
       </Group>
     </>
   );
@@ -164,7 +277,11 @@ export function AnimateTab({ clips }: { clips: Clip[] }) {
         ))}
       </div>
       {(animation === 'highlight' || animation === 'highlightBlock') && (
-        <ColorRow label='Highlight' value={highlightColor} onChange={v => set('Highlight color', text => void (text.highlightColor = v))} />
+        <ColorRow
+          label='Highlight'
+          value={highlightColor}
+          onChange={v => set('Highlight color', text => void (text.highlightColor = v))}
+        />
       )}
     </Group>
   );

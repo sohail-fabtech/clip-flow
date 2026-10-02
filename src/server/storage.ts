@@ -35,7 +35,8 @@ export const extensionOf = (contentType: string) => EXTENSIONS[contentType.split
 
 export const isMediaType = (contentType: string) => /^(video|audio|image)\//.test(contentType);
 
-export const isUploadType = (contentType: string) => isMediaType(contentType) || contentType === 'application/x-cube-lut';
+export const isUploadType = (contentType: string) =>
+  isMediaType(contentType) || contentType === 'application/x-cube-lut';
 
 export function storageKey(folder: 'uploads' | 'renders' | 'voice-overs', fileName: string) {
   const safe = path

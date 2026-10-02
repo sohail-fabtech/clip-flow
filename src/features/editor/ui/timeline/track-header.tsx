@@ -33,25 +33,49 @@ export const TrackHeader = memo(function TrackHeader({ track, canDelete }: { tra
           }}
         />
       ) : (
-        <button type='button' onDoubleClick={() => setEditing(true)} className='w-14 truncate text-left text-xs font-semibold text-ink-2' title='Double-click to rename'>
+        <button
+          type='button'
+          onDoubleClick={() => setEditing(true)}
+          className='w-14 truncate text-left text-xs font-semibold text-ink-2'
+          title='Double-click to rename'
+        >
           {track.name}
         </button>
       )}
       <div className='ml-auto flex items-center'>
         {canDelete && (
-          <IconButton label='Delete track' onClick={() => deleteTrack(track.id)} className='size-6 opacity-0 group-hover/track:opacity-100 [&_svg]:size-3.5'>
+          <IconButton
+            label='Delete track'
+            onClick={() => deleteTrack(track.id)}
+            className='size-6 opacity-0 group-hover/track:opacity-100 [&_svg]:size-3.5'
+          >
             <Trash2 />
           </IconButton>
         )}
-        <IconButton label={track.locked ? 'Unlock track' : 'Lock track'} active={track.locked} onClick={() => updateTrack(track.id, { locked: !track.locked })} className='size-6 [&_svg]:size-3.5'>
+        <IconButton
+          label={track.locked ? 'Unlock track' : 'Lock track'}
+          active={track.locked}
+          onClick={() => updateTrack(track.id, { locked: !track.locked })}
+          className='size-6 [&_svg]:size-3.5'
+        >
           {track.locked ? <Lock /> : <LockOpen />}
         </IconButton>
         {track.kind === 'video' ? (
-          <IconButton label={track.hidden ? 'Show track' : 'Hide track'} active={track.hidden} onClick={() => updateTrack(track.id, { hidden: !track.hidden })} className='size-6 [&_svg]:size-3.5'>
+          <IconButton
+            label={track.hidden ? 'Show track' : 'Hide track'}
+            active={track.hidden}
+            onClick={() => updateTrack(track.id, { hidden: !track.hidden })}
+            className='size-6 [&_svg]:size-3.5'
+          >
             {track.hidden ? <EyeOff /> : <Eye />}
           </IconButton>
         ) : (
-          <IconButton label={track.muted ? 'Unmute track' : 'Mute track'} active={track.muted} onClick={() => updateTrack(track.id, { muted: !track.muted })} className='size-6 [&_svg]:size-3.5'>
+          <IconButton
+            label={track.muted ? 'Unmute track' : 'Mute track'}
+            active={track.muted}
+            onClick={() => updateTrack(track.id, { muted: !track.muted })}
+            className='size-6 [&_svg]:size-3.5'
+          >
             {track.muted ? <VolumeX /> : <Volume2 />}
           </IconButton>
         )}
