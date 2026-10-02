@@ -1,14 +1,23 @@
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { useRef } from 'react';
+import { CircleOff, XIcon } from 'lucide-react';
 import { dispatch } from '@designcombo/events';
 import { EDIT_OBJECT } from '@designcombo/state';
-import { CircleOff, XIcon } from 'lucide-react';
-import useLayoutStore from '@/features/editor/stores/use-layout-store';
-import { useRef } from 'react';
-import useClickOutside from '@/features/editor/hooks/use-click-outside';
+import { ScrollArea } from '@/components/ui/scroll-area';
 import { Separator } from '@/components/ui/separator';
-// import Draggable from 'react-draggable';
+import useLayoutStore from '@/features/editor/stores/use-layout-store';
+import useClickOutside from '@/features/editor/hooks/use-click-outside';
+import type { BoxShadow, TrackItem } from '@/features/editor/types';
 
-export const NONE_PRESET = {
+export interface TextPreset {
+  backgroundColor: string;
+  color: string;
+  borderRadius: number;
+  borderWidth: number;
+  borderColor: string;
+  boxShadow?: BoxShadow;
+}
+
+export const NONE_PRESET: TextPreset = {
   backgroundColor: 'transparent',
   color: '#ffffff',
   borderRadius: 0,
@@ -16,7 +25,7 @@ export const NONE_PRESET = {
   borderColor: 'transparent',
 };
 
-export const TEXT_PRESETS = [
+export const TEXT_PRESETS: TextPreset[] = [
   {
     backgroundColor: '#000',
     color: '#fff',
@@ -122,77 +131,72 @@ export const TEXT_PRESETS = [
   },
 ];
 
-export const getTextShadow = boxShadow => {
-  if (!boxShadow) return undefined;
-  return `${boxShadow.x / 8}px ${boxShadow.y / 8}px ${boxShadow.blur / 8}px ${boxShadow.color}`;
-};
+export const getTextShadow = (boxShadow?: BoxShadow) =>
+  boxShadow ? `${boxShadow.x / 8}px ${boxShadow.y / 8}px ${boxShadow.blur / 8}px ${boxShadow.color}` : undefined;
 
-export const applyPreset = (preset, trackItem) => {
-  console.log(preset);
-  const overrides = {};
-  if (preset.boxShadow === undefined) {
-    preset.boxShadow = { color: 'transparent', x: 0, y: 0, blur: 0 };
-  }
-
+export const applyPreset = (preset: TextPreset, trackItem: TrackItem) =>
   dispatch(EDIT_OBJECT, {
     payload: {
-      [trackItem.id]: {
-        details: { ...preset, ...overrides },
-      },
+      [trackItem.id]: { details: { boxShadow: { color: 'transparent', x: 0, y: 0, blur: 0 }, ...preset } },
     },
   });
-};
 
-export default function TextPresetPicker({ trackItem }) {
-  const { setFloatingControl } = useLayoutStore();
-  const floatingRef = useRef(null);
+export const PresetSwatch = ({ preset }: { preset: TextPreset }) => (
+  <div
+    style={{
+      backgroundColor: preset.backgroundColor,
+      color: preset.color,
+      borderRadius: `${preset.borderRadius}px`,
+      WebkitTextStroke: `2px ${preset.borderColor}`,
+      paintOrder: 'stroke fill',
+      fontWeight: 'bold',
+      textShadow: getTextShadow(preset.boxShadow),
+    }}
+    className='h-6 place-content-center px-2'
+  >
+    Text
+  </div>
+);
+
+export const PresetGrid = ({ trackItem, className }: { trackItem: TrackItem; className: string }) => (
+  <div className={className}>
+    <button
+      type='button'
+      onClick={() => applyPreset(NONE_PRESET, trackItem)}
+      className='flex h-[70px] cursor-pointer items-center justify-center rounded bg-white/10'
+      aria-label='No preset'
+    >
+      <CircleOff />
+    </button>
+    {TEXT_PRESETS.map((preset, index) => (
+      <button
+        type='button'
+        key={index}
+        onClick={() => applyPreset(preset, trackItem)}
+        className='flex h-[70px] cursor-pointer items-center justify-center rounded bg-white/10'
+      >
+        <PresetSwatch preset={preset} />
+      </button>
+    ))}
+  </div>
+);
+
+export default function TextPresetPicker({ trackItem }: { trackItem: TrackItem }) {
+  const setFloatingControl = useLayoutStore(state => state.setFloatingControl);
+  const floatingRef = useRef<HTMLDivElement>(null);
   useClickOutside(floatingRef, () => setFloatingControl(''));
 
   return (
-    <div
-      ref={floatingRef}
-      className='absolute right-2 top-2 z-[200] w-56 border-none bg-[#27272A] text-white rounded p-0'
-    >
-      <div className='handle flex cursor-grab items-center justify-between px-4 py-3'>
+    <div ref={floatingRef} className='absolute right-2 top-2 z-[200] w-56 rounded border-none bg-[#27272A] p-0 text-white'>
+      <div className='flex items-center justify-between px-4 py-3'>
         <p className='text-sm font-bold'>Presets</p>
-        <div className='h-4 w-4' onClick={() => setFloatingControl('')}>
-          <XIcon className='h-3 w-3 cursor-pointer font-extrabold text-muted-foreground' />
-        </div>
+        <button type='button' onClick={() => setFloatingControl('')} aria-label='Close'>
+          <XIcon className='h-3 w-3 text-muted-foreground' />
+        </button>
       </div>
-
       <Separator className='w-full bg-white/60' />
       <ScrollArea className='h-[400px] w-full py-0'>
-        <div className='grid grid-cols-3 gap-2 px-4 py-2'>
-          <div
-            onClick={() => applyPreset(NONE_PRESET, trackItem)}
-            className='flex h-[70px] cursor-pointer items-center justify-center bg-white/10 rounded'
-          >
-            <CircleOff />
-          </div>
-
-          {TEXT_PRESETS.map((preset, index) => (
-            <div
-              key={index}
-              onClick={() => applyPreset(preset, trackItem)}
-              className='text-md flex h-[70px] cursor-pointer items-center justify-center bg-white/10 rounded'
-            >
-              <div
-                style={{
-                  backgroundColor: preset.backgroundColor,
-                  color: preset.color,
-                  borderRadius: `${preset.borderRadius}px`,
-                  WebkitTextStroke: `2px ${preset.borderColor}`,
-                  paintOrder: 'stroke fill',
-                  fontWeight: 'bold',
-                  textShadow: getTextShadow(preset.boxShadow),
-                }}
-                className='h-6 place-content-center px-2'
-              >
-                Text
-              </div>
-            </div>
-          ))}
-        </div>
+        <PresetGrid trackItem={trackItem} className='grid grid-cols-3 gap-2 px-4 py-2' />
       </ScrollArea>
     </div>
   );

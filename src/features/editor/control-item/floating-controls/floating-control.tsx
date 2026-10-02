@@ -4,14 +4,8 @@ import TextPresetPicker from '@/features/editor/control-item/floating-controls/t
 
 export default function FloatingControl() {
   const { floatingControl, trackItem } = useLayoutStore();
-
   if (!trackItem) return null;
-
-  if (floatingControl === 'font-family-picker') {
-    return <FontFamilyPicker />;
-  }
-  // if (floatingControl === 'text-preset-picker') {
-  //   return <TextPresetPicker trackItem={trackItem} />;
-  // }
+  if (floatingControl === 'font-family-picker') return <FontFamilyPicker />;
+  if (floatingControl === 'text-preset-picker') return <TextPresetPicker trackItem={trackItem} />;
   return null;
 }

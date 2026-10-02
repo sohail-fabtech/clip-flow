@@ -1,4 +1,6 @@
 import { groupBy } from 'lodash';
+import { dispatch } from '@designcombo/events';
+import { EDIT_OBJECT } from '@designcombo/state';
 import type { CompactFont, FontInfo } from '@/features/editor/types';
 
 export interface FontSource {
@@ -22,3 +24,13 @@ export const getCompactFontData = (fonts: FontInfo[]): CompactFont[] =>
     styles,
     default: findDefaultFont(styles),
   }));
+
+export const styleNameOf = (postScriptName: string) =>
+  postScriptName.substring(postScriptName.lastIndexOf('-') + 1).replace('Italic', ' Italic');
+
+export async function applyFont(trackItemId: string, font: FontInfo) {
+  await loadFonts([{ name: font.postScriptName, url: font.url }]);
+  dispatch(EDIT_OBJECT, {
+    payload: { [trackItemId]: { details: { fontFamily: font.postScriptName, fontUrl: font.url } } },
+  });
+}
