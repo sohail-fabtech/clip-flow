@@ -1,6 +1,7 @@
 import { groupBy } from 'lodash';
 import { dispatch } from '@designcombo/events';
 import { EDIT_OBJECT } from '@designcombo/state';
+import type { IDesign } from '@designcombo/types';
 import type { CompactFont, FontInfo } from '@/features/editor/types';
 
 export interface FontSource {
@@ -34,3 +35,8 @@ export async function applyFont(trackItemId: string, font: FontInfo) {
     payload: { [trackItemId]: { details: { fontFamily: font.postScriptName, fontUrl: font.url } } },
   });
 }
+
+export const fontsOfDesign = (design: IDesign): FontSource[] =>
+  Object.values(design.trackItemsMap)
+    .filter(item => item.details?.fontFamily && item.details?.fontUrl)
+    .map(item => ({ name: item.details.fontFamily as string, url: item.details.fontUrl as string }));

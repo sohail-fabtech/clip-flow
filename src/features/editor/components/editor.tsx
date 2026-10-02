@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
-import StateManager from '@designcombo/state';
-import type { ITrackItem } from '@designcombo/types';
+import { dispatch } from '@designcombo/events';
+import StateManager, { DESIGN_LOAD } from '@designcombo/state';
+import type { TrackItem } from '@/features/editor/types';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
 import Navbar from '@/features/editor/components/navbar';
 import MenuList from '@/features/editor/components/menu-list';
@@ -18,7 +19,8 @@ import useDataState from '@/features/editor/stores/use-data-state';
 import useLayoutStore from '@/features/editor/stores/use-layout-store';
 import useTimelineEvents from '@/features/editor/hooks/use-timeline-events';
 import { useIsLargeScreen } from '@/features/editor/hooks/use-media-query';
-import { getCompactFontData, loadFonts } from '@/features/editor/utils/fonts';
+import { fontsOfDesign, getCompactFontData, loadFonts } from '@/features/editor/utils/fonts';
+import { loadProject } from '@/features/editor/services/project';
 import { SECONDARY_FONT, SECONDARY_FONT_URL } from '@/features/editor/constants/constants';
 import { FONTS } from '@/features/editor/data/fonts';
 
@@ -28,7 +30,7 @@ const TIMELINE_CHROME = { height: 90, width: 40 };
 
 function Editor() {
   const [projectName, setProjectName] = useState('Untitled video');
-  const [trackItem, setTrackItem] = useState<ITrackItem | null>(null);
+  const [trackItem, setTrackItem] = useState<TrackItem | null>(null);
   const sceneRef = useRef<SceneHandle>(null);
   const { timeline, playerRef, activeIds, trackItemsMap } = useStore();
   const { setTrackItem: setLayoutTrackItem, setFloatingControl, setLabelControlItem, setTypeControlItem } =
@@ -43,6 +45,15 @@ function Editor() {
     setFonts(FONTS);
     loadFonts([{ name: SECONDARY_FONT, url: SECONDARY_FONT_URL }]);
   }, [setCompactFonts, setFonts]);
+
+  useEffect(() => {
+    if (!timeline) return;
+    const saved = loadProject();
+    if (!saved) return;
+    setProjectName(saved.name);
+    loadFonts(fontsOfDesign(saved.design));
+    dispatch(DESIGN_LOAD, { payload: saved.design });
+  }, [timeline]);
 
   useEffect(() => {
     const resizeTimeline = () => {
@@ -68,7 +79,7 @@ function Editor() {
   }, [timeline]);
 
   useEffect(() => {
-    const selected = activeIds.length === 1 ? (trackItemsMap[activeIds[0]] ?? null) : null;
+    const selected = activeIds.length === 1 ? ((trackItemsMap[activeIds[0]] as TrackItem | undefined) ?? null) : null;
     setTrackItem(selected);
     setLayoutTrackItem(selected);
   }, [activeIds, trackItemsMap, setLayoutTrackItem]);

@@ -37,7 +37,7 @@ export const calculateTextStyles = (details: ItemDetails): CSSProperties => ({
   lineHeight: details.lineHeight || 'normal',
   letterSpacing: details.letterSpacing || 'normal',
   wordSpacing: details.wordSpacing || 'normal',
-  wordWrap: details.wordWrap || '',
+  wordWrap: (details.wordWrap || 'normal') as CSSProperties['wordWrap'],
   wordBreak: (details.wordBreak || 'normal') as CSSProperties['wordBreak'],
   textTransform: (details.textTransform || 'none') as CSSProperties['textTransform'],
   fontSize: details.fontSize || '16px',

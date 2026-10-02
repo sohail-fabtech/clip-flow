@@ -1,49 +1,49 @@
-import React, { useState, useEffect } from 'react';
-import { useIsLargeScreen, useIsMediumScreen, useIsSmallScreen } from '@/features/editor/hooks/use-media-query';
-import DownloadProgressModal from '@/features/editor/components/download-progress-modal';
+import { useState } from 'react';
+import { Check } from 'lucide-react';
+import { dispatch } from '@designcombo/events';
+import type StateManager from '@designcombo/state';
+import { HISTORY_REDO, HISTORY_UNDO } from '@designcombo/state';
+import { generateId } from '@designcombo/timeline';
+import type { IDesign } from '@designcombo/types';
 import { LogoIcons } from '@/components/shared/logos';
 import { Icons } from '@/components/shared/icons';
 import { Button } from '@/components/ui/button';
-import { dispatch } from '@designcombo/events';
-import { HISTORY_UNDO, HISTORY_REDO } from '@designcombo/state';
 import AutosizeInput from '@/components/ui/autosize-input';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Label } from '@/components/ui/label';
-import { generateId } from '@designcombo/timeline';
-import { useDownloadState } from '@/features/editor/stores/use-download-state';
-import { GlassicButton } from '@/components/shared/glassic-button';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import DownloadProgressModal from '@/features/editor/components/download-progress-modal';
+import { useIsLargeScreen, useIsSmallScreen } from '@/features/editor/hooks/use-media-query';
+import { useDownloadState, type ExportType } from '@/features/editor/stores/use-download-state';
+import { saveProject } from '@/features/editor/services/project';
 
-function Navbar({ user, stateManager, setProjectName, projectName = 'Untitled' }) {
-  const [title, setTitle] = useState(projectName);
+interface NavbarProps {
+  stateManager: StateManager;
+  projectName: string;
+  setProjectName: (name: string) => void;
+}
+
+const designOf = (stateManager: StateManager): IDesign => ({ id: generateId(), ...stateManager.getState() });
+
+function Navbar({ stateManager, projectName, setProjectName }: NavbarProps) {
+  const [saved, setSaved] = useState(false);
   const isLargeScreen = useIsLargeScreen();
-  const isMediumScreen = useIsMediumScreen();
   const isSmallScreen = useIsSmallScreen();
 
-  const handleUndo = () => {
-    dispatch(HISTORY_UNDO);
+  const save = () => {
+    saveProject(projectName, designOf(stateManager));
+    setSaved(true);
+    setTimeout(() => setSaved(false), 1500);
   };
 
-  const handleRedo = () => {
-    dispatch(HISTORY_REDO);
-  };
-
-  const handleTitleChange = e => {
-    setTitle(e.target.value);
-  };
   return (
     <div
-      style={{
-        display: 'grid',
-        gridTemplateColumns: isLargeScreen ? '320px 1fr 320px' : '1fr 1fr 1fr',
-      }}
-      className='pointer-events-none flex h-18 items-center border-b border-border/80 p-2'
+      style={{ gridTemplateColumns: isLargeScreen ? '320px 1fr 320px' : '1fr 1fr 1fr' }}
+      className='pointer-events-none grid h-18 items-center border-b border-border/80 p-2'
     >
       <DownloadProgressModal />
 
-      <div className='flex items-center gap-2'>
-        <div className='pointer-events-auto flex h-8 w-8 items-center justify-center rounded-md text-zinc-200'>
-          <LogoIcons.rethread />
-        </div>
+      <div className='pointer-events-auto flex h-8 w-8 items-center justify-center rounded-md text-zinc-200'>
+        <LogoIcons.rethread />
       </div>
 
       <div className='flex h-11 items-center justify-center gap-2'>
@@ -51,141 +51,101 @@ function Navbar({ user, stateManager, setProjectName, projectName = 'Untitled' }
           <div className='pointer-events-auto flex h-10 items-center gap-2 rounded-md px-2.5 text-muted-foreground'>
             <AutosizeInput
               name='title'
-              value={title}
-              onChange={handleTitleChange}
-              width={400}
-              inputClassName='border-none  outline-none px-1 min-w-20 text-sm font-medium text-zinc-200'
+              aria-label='Project name'
+              value={projectName}
+              onChange={event => setProjectName(event.target.value)}
+              inputClassName='min-w-20 border-none px-1 text-sm font-medium text-zinc-200 outline-none'
             />
           </div>
         )}
       </div>
 
       <div className='flex h-11 items-center justify-end gap-2'>
-        <div className=' pointer-events-auto flex h-10 items-center gap-2 rounded-md px-2.5'>
+        <div className='pointer-events-auto flex h-10 items-center gap-2 rounded-md px-2.5'>
           {!isSmallScreen && (
             <>
-              {/* <GlassicButton
-                title='Save Changes'
-                className='cursor-pointer glass-btn font-light w-full sm:w-auto !p-5 text-sm sm:text-base transition-all flex items-center'
-                icon={<Icons.save width={16} />}
-                // onClick={() => }
-              />
-              <GlassicButton
-                title='Share'
-                className='cursor-pointer glass-btn font-light w-full sm:w-auto !p-5 text-sm sm:text-base transition-all flex items-center'
-                icon={<Icons.share width={16} />}
-                // onClick={() => }
-              /> */}
-              <div className='glass-bg rounded-[6px] pointer-events-auto flex h-9 items-center px-1.5 ml-6'>
+              <div className='glass-bg ml-6 flex h-9 items-center rounded-[6px] px-1.5'>
                 <Button
-                  onClick={handleUndo}
-                  className='text-muted-foreground hover:text-white cursor-pointer'
+                  onClick={() => dispatch(HISTORY_UNDO)}
+                  className='cursor-pointer text-muted-foreground hover:text-white'
                   variant='ghost'
                   size='icon'
+                  aria-label='Undo'
                 >
                   <Icons.undo width={20} />
                 </Button>
                 <Button
-                  onClick={handleRedo}
-                  className='text-muted-foreground hover:text-white cursor-pointer'
+                  onClick={() => dispatch(HISTORY_REDO)}
+                  className='cursor-pointer text-muted-foreground hover:text-white'
                   variant='ghost'
                   size='icon'
+                  aria-label='Redo'
                 >
                   <Icons.redo width={20} />
                 </Button>
               </div>
-              <Button className='bg-white/20 hover:bg-white/20 text-white rounded font-normal cursor-pointer'>
-                Save Changes
+              <Button onClick={save} className='cursor-pointer rounded bg-white/20 font-normal text-white hover:bg-white/30'>
+                {saved ? <Check className='h-4 w-4' /> : null}
+                {saved ? 'Saved' : 'Save Changes'}
               </Button>
             </>
           )}
-
-          <DownloadPopover stateManager={stateManager} />
+          <ExportPopover stateManager={stateManager} />
         </div>
       </div>
     </div>
   );
 }
 
-const DownloadPopover = ({ stateManager }) => {
-  const isMediumScreen = useIsMediumScreen();
+const EXPORT_TYPES: ExportType[] = ['mp4', 'json'];
+
+const ExportPopover = ({ stateManager }: { stateManager: StateManager }) => {
   const { actions, exportType } = useDownloadState();
-  const [isExportTypeOpen, setIsExportTypeOpen] = useState(false);
   const [open, setOpen] = useState(false);
+  const [typeOpen, setTypeOpen] = useState(false);
 
   const handleExport = () => {
-    const data = {
-      id: generateId(),
-      ...stateManager.getState(),
-    };
-
-    actions.setState({ payload: data });
+    actions.setPayload(designOf(stateManager));
     actions.startExport();
+    setOpen(false);
   };
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger>
-        {/* <GlassicButton
-          title='Export'
-          className='cursor-pointer glass-btn font-light w-full sm:w-auto !p-5 text-sm sm:text-base transition-all flex items-center'
-          icon={<Icons.download width={16} />}
-          // onClick={() => setOpen(!open)}
-        /> */}
-        <Button className='bg-white hover:bg-white text-black rounded font-normal cursor-pointer'>Export</Button>
+      <PopoverTrigger asChild>
+        <Button className='cursor-pointer rounded bg-white font-normal text-black hover:bg-white/90'>Export</Button>
       </PopoverTrigger>
       <PopoverContent
         align='end'
-        className='z-[250] flex w-60 flex-col gap-4 bg-primary border border-white/10 rounded-[10px] text-white'
+        className='z-[250] flex w-60 flex-col gap-4 rounded-[10px] border border-white/10 bg-primary text-white'
       >
         <Label>Export settings</Label>
-
-        <Popover open={isExportTypeOpen} onOpenChange={setIsExportTypeOpen}>
-          <PopoverTrigger>
-            <Button className='w-full justify-between border-white/10 rounded' variant='outline'>
-              <div>{exportType.toUpperCase()}</div>
+        <Popover open={typeOpen} onOpenChange={setTypeOpen}>
+          <PopoverTrigger asChild>
+            <Button className='w-full justify-between rounded border-white/10' variant='outline'>
+              {exportType.toUpperCase()}
               <Icons.arrowDown width={16} />
             </Button>
           </PopoverTrigger>
-          <PopoverContent className=' z-[251] w-[--radix-popover-trigger-width] px-2 py-2 bg-primary border border-white/30 rounded-[10px] text-white'>
-            <div
-              className='flex h-7 items-center rounded-sm px-3 text-sm hover:cursor-pointer hover:bg-zinc-800'
-              onClick={() => {
-                actions.setExportType('mp4');
-                setIsExportTypeOpen(false);
-              }}
-            >
-              MP4
-            </div>
-            <div
-              className='flex h-7 items-center rounded-sm px-3 text-sm hover:cursor-pointer hover:bg-zinc-800'
-              onClick={() => {
-                actions.setExportType('json');
-                setIsExportTypeOpen(false);
-              }}
-            >
-              JSON
-            </div>
+          <PopoverContent className='z-[251] w-(--radix-popover-trigger-width) rounded-[10px] border border-white/30 bg-primary px-2 py-2 text-white'>
+            {EXPORT_TYPES.map(type => (
+              <button
+                type='button'
+                key={type}
+                className='flex h-7 w-full items-center rounded-sm px-3 text-sm hover:bg-zinc-800'
+                onClick={() => {
+                  actions.setExportType(type);
+                  setTypeOpen(false);
+                }}
+              >
+                {type.toUpperCase()}
+              </button>
+            ))}
           </PopoverContent>
         </Popover>
-
-        <div>
-          {/* <GlassicButton
-            title='Export'
-            className='cursor-pointer glass-btn font-light w-full !p-5 text-sm sm:text-base transition-all flex items-center'
-            icon={<Icons.download width={16} />}
-            onClick={handleExport}
-          /> */}
-          <Button
-            onClick={handleExport}
-            className='bg-white hover:bg-white w-full text-black rounded font-normal cursor-pointer'
-          >
-            Export
-          </Button>
-          {/* <Button onClick={handleExport} className='w-full'>
-            Export
-          </Button> */}
-        </div>
+        <Button onClick={handleExport} className='w-full cursor-pointer rounded bg-white font-normal text-black hover:bg-white/90'>
+          Export
+        </Button>
       </PopoverContent>
     </Popover>
   );
