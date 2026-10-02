@@ -5,7 +5,9 @@ const MAX_UPLOAD_BYTES = 2 * 1024 * 1024 * 1024;
 export async function GET(request: Request, ctx: RouteContext<'/api/files/[...path]'>) {
   const { path } = await ctx.params;
   try {
-    return await streamFile(path.join('/'), request.headers.get('range'));
+    const response = await streamFile(path.join('/'), request.headers.get('range'));
+    response.headers.set('Access-Control-Allow-Origin', '*');
+    return response;
   } catch {
     return Response.json({ error: 'Not found' }, { status: 404 });
   }

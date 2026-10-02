@@ -286,8 +286,4 @@ export class GradeRenderer {
       uResolution: [this.size.width, this.size.height],
     });
   }
-
-  dispose() {
-    this.gl.getExtension('WEBGL_lose_context')?.loseContext();
-  }
 }

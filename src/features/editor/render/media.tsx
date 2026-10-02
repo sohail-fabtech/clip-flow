@@ -29,16 +29,21 @@ const loadLut = (src: string) => {
 };
 
 function useLut(src: string, enabled: boolean) {
-  const [lut, setLut] = useState<{ src: string; lut: CubeLut } | null>(null);
+  const [lut, setLut] = useState<{ src: string; lut: CubeLut | null } | null>(null);
+  const ready = !enabled || !src || lut?.src === src;
   useEffect(() => {
-    if (!enabled || !src) return;
+    if (ready) return;
+    let alive = true;
     const handle = delayRender(`Loading LUT ${src}`);
     loadLut(src)
-      .then(result => setLut({ src, lut: result }))
-      .catch(() => setLut(null))
-      .finally(() => continueRender(handle));
-  }, [src, enabled]);
-  return enabled && lut?.src === src ? lut : null;
+      .catch(() => null)
+      .then(result => alive && setLut({ src, lut: result }));
+    return () => {
+      alive = false;
+      continueRender(handle);
+    };
+  }, [src, ready]);
+  return enabled && lut?.src === src && lut.lut ? (lut as { src: string; lut: CubeLut }) : null;
 }
 
 function useGl(grade: Grade | null, softness: number) {
@@ -48,24 +53,29 @@ function useGl(grade: Grade | null, softness: number) {
   const frame = useCurrentFrame();
   const state = useRef({ grade, softness, frame, lut });
   state.current = { grade, softness, frame, lut };
+  const last = useRef<{ source: TexImageSource; width: number; height: number } | null>(null);
 
   useEffect(() => {
     if (!canvasRef.current) return;
     rendererRef.current = new GradeRenderer(canvasRef.current);
     return () => {
-      rendererRef.current?.dispose();
       rendererRef.current = null;
     };
   }, []);
 
   const draw = useCallback((source: TexImageSource, width: number, height: number) => {
     const renderer = rendererRef.current;
+    last.current = { source, width, height };
     if (!renderer || !width || !height || !state.current.grade) return;
     const { grade: g, softness: s, frame: f, lut: l } = state.current;
     renderer.setLut(l?.lut ?? null, l?.src ?? '');
     const scale = Math.min(1, MAX_GL_SIZE / Math.max(width, height));
     renderer.render(source, width * scale, height * scale, g, s, f);
   }, []);
+
+  useEffect(() => {
+    if (last.current) draw(last.current.source, last.current.width, last.current.height);
+  }, [grade, softness, lut, draw]);
 
   return { canvasRef, draw };
 }
@@ -89,7 +99,7 @@ export function VideoMedia({ src, sourceIn, speed, volume, muted, grade, softnes
       const video = frame as HTMLVideoElement & HTMLImageElement;
       gl.draw(video, video.videoWidth || video.naturalWidth, video.videoHeight || video.naturalHeight);
     },
-    [gl],
+    [gl.draw],
   );
 
   const media = (
@@ -133,8 +143,8 @@ export function ImageMedia({ src, grade, softness }: { src: string; grade: Grade
   }, [src, grade === null]);
 
   useEffect(() => {
-    if (grade && image) gl.draw(image, image.naturalWidth, image.naturalHeight);
-  }, [grade, image, frame, softness, gl]);
+    if (image) gl.draw(image, image.naturalWidth, image.naturalHeight);
+  }, [image, frame, gl.draw]);
 
   if (!grade) return <Img src={src} style={FILL} />;
   return <canvas ref={gl.canvasRef} style={FILL} />;

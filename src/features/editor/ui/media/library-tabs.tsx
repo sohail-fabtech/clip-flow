@@ -212,7 +212,7 @@ export function TextPresetsTab() {
               className='max-w-full truncate px-1'
               style={{
                 ...textCss({ ...defaultTextStyle(), ...preset.style, fontSize: 20 }),
-                fontFamily: 'ui-sans-serif',
+                fontFamily: 'inherit',
                 whiteSpace: 'nowrap',
               }}
             >
@@ -364,7 +364,7 @@ export function CaptionsTab() {
                 fontSize: 12,
                 strokeWidth: Math.min(1, preset.style.strokeWidth ?? 0),
               }),
-              fontFamily: 'ui-sans-serif',
+              fontFamily: 'inherit',
             }}
           >
             {preset.label}
