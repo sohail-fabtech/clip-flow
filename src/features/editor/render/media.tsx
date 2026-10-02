@@ -28,19 +28,35 @@ const loadLut = (src: string) => {
   return lutCache.get(src)!;
 };
 
+export function useHoldRender(ready: boolean, label: string) {
+  const handle = useRef<number | null>(null);
+  if (!ready && handle.current === null) handle.current = delayRender(label);
+  useEffect(() => {
+    if (!ready || handle.current === null) return;
+    continueRender(handle.current);
+    handle.current = null;
+  }, [ready]);
+  useEffect(
+    () => () => {
+      if (handle.current !== null) continueRender(handle.current);
+      handle.current = null;
+    },
+    [],
+  );
+}
+
 function useLut(src: string, enabled: boolean) {
   const [lut, setLut] = useState<{ src: string; lut: CubeLut | null } | null>(null);
   const ready = !enabled || !src || lut?.src === src;
+  useHoldRender(ready, `Loading LUT ${src}`);
   useEffect(() => {
     if (ready) return;
     let alive = true;
-    const handle = delayRender(`Loading LUT ${src}`);
     loadLut(src)
       .catch(() => null)
       .then(result => alive && setLut({ src, lut: result }));
     return () => {
       alive = false;
-      continueRender(handle);
     };
   }, [src, ready]);
   return enabled && lut?.src === src && lut.lut ? (lut as { src: string; lut: CubeLut }) : null;
@@ -126,24 +142,26 @@ export function VideoMedia({ src, sourceIn, speed, volume, muted, grade, softnes
 
 export function ImageMedia({ src, grade, softness }: { src: string; grade: Grade | null; softness: number }) {
   const gl = useGl(grade, softness);
-  const [image, setImage] = useState<HTMLImageElement | null>(null);
+  const [image, setImage] = useState<{ src: string; element: HTMLImageElement | null } | null>(null);
   const frame = useCurrentFrame();
+  const graded = grade !== null;
+  useHoldRender(!graded || image?.src === src, `Loading image ${src}`);
 
   useEffect(() => {
-    if (!grade) return;
-    const handle = delayRender(`Loading image ${src}`);
+    if (!graded) return;
     const element = new Image();
     element.crossOrigin = 'anonymous';
-    element.onload = () => {
-      setImage(element);
-      continueRender(handle);
-    };
-    element.onerror = () => continueRender(handle);
+    element.onload = () => setImage({ src, element });
+    element.onerror = () => setImage({ src, element: null });
     element.src = src;
-  }, [src, grade === null]);
+    return () => {
+      element.onload = element.onerror = null;
+    };
+  }, [src, graded]);
 
   useEffect(() => {
-    if (image) gl.draw(image, image.naturalWidth, image.naturalHeight);
+    const element = image?.element;
+    if (element) gl.draw(element, element.naturalWidth, element.naturalHeight);
   }, [image, frame, gl.draw]);
 
   if (!grade) return <Img src={src} style={FILL} />;

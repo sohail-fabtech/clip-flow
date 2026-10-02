@@ -1,6 +1,7 @@
 import { useEffect, useState, type CSSProperties } from 'react';
-import { continueRender, delayRender, interpolate, spring, useVideoConfig } from 'remotion';
+import { interpolate, spring, useVideoConfig } from 'remotion';
 import type { TextClip, TextStyle } from '@/features/editor/model/types';
+import { useHoldRender } from '@/features/editor/render/media';
 
 const loaded = new Map<string, Promise<void>>();
 
@@ -20,15 +21,16 @@ export function loadFont(family: string, url: string) {
   return loaded.get(family)!;
 }
 
-function useFont(style: TextStyle) {
-  const [, setReady] = useState(0);
+function useFont({ fontFamily, fontUrl }: TextStyle) {
+  const [loadedUrl, setLoadedUrl] = useState<string | null>(null);
+  useHoldRender(loadedUrl === fontUrl, `Loading font ${fontFamily}`);
   useEffect(() => {
-    const handle = delayRender(`Loading font ${style.fontFamily}`);
-    loadFont(style.fontFamily, style.fontUrl).then(() => {
-      setReady(n => n + 1);
-      continueRender(handle);
-    });
-  }, [style.fontFamily, style.fontUrl]);
+    let alive = true;
+    loadFont(fontFamily, fontUrl).then(() => alive && setLoadedUrl(fontUrl));
+    return () => {
+      alive = false;
+    };
+  }, [fontFamily, fontUrl]);
 }
 
 export const textCss = (style: TextStyle): CSSProperties => ({

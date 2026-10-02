@@ -67,7 +67,8 @@ export class GradeRenderer {
       const s = gl.createShader(type)!;
       gl.shaderSource(s, code);
       gl.compileShader(s);
-      if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s) || (gl.isContextLost() ? 'WebGL context lost' : 'Shader error'));
+      if (!gl.getShaderParameter(s, gl.COMPILE_STATUS))
+        throw new Error(gl.getShaderInfoLog(s) || (gl.isContextLost() ? 'WebGL context lost' : 'Shader error'));
       return s;
     };
     const program = gl.createProgram()!;
