@@ -1,35 +1,23 @@
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 import useLayoutStore from '@/features/editor/stores/use-layout-store';
 import usePropertiesStore from '@/features/editor/stores/use-property-store';
-import TextPropertieItems from '@/features/editor/control-item/properties/text-property-items';
-import ImagePropertieItems from '@/features/editor/control-item/properties/image-property-items';
-import VideoPropertieItems from '@/features/editor/control-item/properties/video-property-items';
-import AudioPropertieItems from '@/features/editor/control-item/properties/audio-property-items';
+import { PROPERTY_MENUS, PropertyMenu } from '@/features/editor/control-item/properties/property-menu';
 import PropertiesItemsList from '@/features/editor/control-item/properties/property-items-list';
 
 function Properties() {
-  const { trackItem } = useLayoutStore();
-  const { resetProperties } = usePropertiesStore();
+  const trackItem = useLayoutStore(state => state.trackItem);
+  const resetProperties = usePropertiesStore(state => state.resetProperties);
 
-  // Reset properties when no trackItem is selected
   useEffect(() => {
-    if (!trackItem) {
-      resetProperties();
-    }
+    if (!trackItem) resetProperties();
   }, [trackItem, resetProperties]);
 
-  if (!trackItem) return null;
+  const items = trackItem && PROPERTY_MENUS[trackItem.type];
+  if (!items) return null;
 
   return (
     <>
-      {
-        {
-          text: <TextPropertieItems />,
-          image: <ImagePropertieItems />,
-          video: <VideoPropertieItems />,
-          audio: <AudioPropertieItems />,
-        }[trackItem.type]
-      }
+      <PropertyMenu items={items} />
       <PropertiesItemsList />
     </>
   );
