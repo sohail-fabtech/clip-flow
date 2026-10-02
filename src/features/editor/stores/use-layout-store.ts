@@ -3,7 +3,6 @@ import type { TrackItem } from '@/features/editor/types';
 
 interface LayoutStore {
   activeMenuItem: string;
-  showMenuItem: boolean;
   cropTarget: TrackItem | null;
   floatingControl: string;
   drawerOpen: boolean;
@@ -13,7 +12,6 @@ interface LayoutStore {
   trackItem: TrackItem | null;
   setCropTarget: (cropTarget: TrackItem | null) => void;
   setActiveMenuItem: (activeMenuItem: string) => void;
-  setShowMenuItem: (showMenuItem: boolean) => void;
   setFloatingControl: (floatingControl: string) => void;
   setDrawerOpen: (drawerOpen: boolean) => void;
   setTrackItem: (trackItem: TrackItem | null) => void;
@@ -24,7 +22,6 @@ interface LayoutStore {
 
 const useLayoutStore = create<LayoutStore>(set => ({
   activeMenuItem: '',
-  showMenuItem: false,
   cropTarget: null,
   floatingControl: '',
   drawerOpen: false,
@@ -34,7 +31,6 @@ const useLayoutStore = create<LayoutStore>(set => ({
   trackItem: null,
   setCropTarget: cropTarget => set({ cropTarget }),
   setActiveMenuItem: activeMenuItem => set({ activeMenuItem }),
-  setShowMenuItem: showMenuItem => set({ showMenuItem }),
   setFloatingControl: floatingControl => set({ floatingControl }),
   setDrawerOpen: drawerOpen => set({ drawerOpen }),
   setTrackItem: trackItem => set({ trackItem }),

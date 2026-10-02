@@ -7,7 +7,6 @@ export function BrandTemplate() {
       <h1 className='text-sm p-3'>Brand Template</h1>
       <Separator className='w-full bg-white/60' />
 
-      {/* content */}
       <div className='p-2'>Content for Brand Template</div>
     </div>
   );

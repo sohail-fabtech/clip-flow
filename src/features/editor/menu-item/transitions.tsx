@@ -7,7 +7,6 @@ export function Transitions() {
       <h1 className='text-sm p-3'>Transitions</h1>
       <Separator className='w-full bg-white/60' />
 
-      {/* content */}
       <div className='p-2'>Content for Transitions</div>
     </div>
   );

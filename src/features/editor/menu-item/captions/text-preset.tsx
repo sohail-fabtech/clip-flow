@@ -1,12 +1,22 @@
-import { ScrollArea } from '@/components/ui/scroll-area';
+import { CircleOff } from 'lucide-react';
 import { dispatch } from '@designcombo/events';
 import { EDIT_OBJECT } from '@designcombo/state';
-import { CircleOff } from 'lucide-react';
-import useLayoutStore from '@/features/editor/stores/use-layout-store';
-import { useRef } from 'react';
-import useClickOutside from '@/features/editor/hooks/use-click-outside';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import useStore from '@/features/editor/stores/use-store';
+import type { BoxShadow, TrackItem } from '@/features/editor/types';
 
-export const NONE_PRESET = {
+interface CaptionPreset {
+  name?: string;
+  backgroundColor: string;
+  color: string;
+  borderRadius: number;
+  borderWidth: number;
+  borderColor: string;
+  boxShadow?: BoxShadow;
+  style?: string;
+}
+
+const NONE_PRESET: CaptionPreset = {
   backgroundColor: 'transparent',
   color: '#ffffff',
   borderRadius: 0,
@@ -14,7 +24,7 @@ export const NONE_PRESET = {
   borderColor: 'transparent',
 };
 
-export const TEXT_PRESETS = [
+const TEXT_PRESETS: CaptionPreset[] = [
   {
     name: 'Karaoke',
     backgroundColor: '#000000',
@@ -129,94 +139,73 @@ export const TEXT_PRESETS = [
   },
 ];
 
-export const getTextShadow = boxShadow => {
-  if (!boxShadow) return undefined;
-  return `${boxShadow.x}px ${boxShadow.y}px ${boxShadow.blur}px ${boxShadow.color}`;
+const getTextShadow = (boxShadow?: BoxShadow) =>
+  boxShadow ? `${boxShadow.x}px ${boxShadow.y}px ${boxShadow.blur}px ${boxShadow.color}` : undefined;
+
+const DISPLAY_TEXT: Record<string, string> = {
+  karaoke: 'TO GET STARTED',
+  outlined: 'CHOOSE A STYLE',
+  neon: 'TO GET STARTED',
 };
 
-export const applyPreset = (preset, trackItem) => {
-  console.log(preset);
-  const overrides = {};
-  if (preset.boxShadow === undefined) {
-    preset.boxShadow = { color: 'transparent', x: 0, y: 0, blur: 0 };
-  }
-
-  dispatch(EDIT_OBJECT, {
-    payload: {
-      [trackItem.id]: {
-        details: { ...preset, ...overrides },
-      },
-    },
-  });
+const captionTargets = (trackItem: TrackItem | null) => {
+  if (trackItem) return [trackItem.id];
+  return Object.values(useStore.getState().trackItemsMap)
+    .filter(item => item.type === 'text' && item.metadata?.autoCaption)
+    .map(item => item.id);
 };
 
-export default function TextPreset({ trackItem }) {
-  const { setFloatingControl } = useLayoutStore();
-  const floatingRef = useRef(null);
-  useClickOutside(floatingRef, () => setFloatingControl(''));
+const applyPreset = ({ name: _name, style: _style, ...preset }: CaptionPreset, trackItem: TrackItem | null) => {
+  const details = { boxShadow: { color: 'transparent', x: 0, y: 0, blur: 0 }, ...preset };
+  const ids = captionTargets(trackItem);
+  if (ids.length === 0) return;
+  dispatch(EDIT_OBJECT, { payload: Object.fromEntries(ids.map(id => [id, { details }])) });
+};
 
-  const getPresetDisplayText = preset => {
-    switch (preset.style) {
-      case 'karaoke':
-        return 'TO GET STARTED';
-      case 'outlined':
-        return 'CHOOSE A STYLE';
-      case 'neon':
-        return 'TO GET STARTED';
-      default:
-        return preset.name || 'Text';
-    }
-  };
-
+export default function TextPreset({ trackItem }: { trackItem: TrackItem | null }) {
   return (
-    <div ref={floatingRef} className='w-full p-0'>
-      <ScrollArea className='h-[400px] w-full pt-4'>
-        <div className='space-y-3'>
-          {/* No Captions Option */}
-          <div
-            onClick={() => applyPreset(NONE_PRESET, trackItem)}
-            className='flex cursor-pointer items-center justify-center'
-          >
-            <div className='flex flex-col items-center gap-1 w-full'>
-              <div className='bg-gray-700/50 transition-colors w-full p-3 rounded flex items-center justify-center border border-transparent hover:border-white/40'>
-                <CircleOff className='w-5 h-5 text-gray-400 ' />
-              </div>
-              <span className='text-xs text-gray-300'>No captions</span>
-            </div>
-          </div>
+    <ScrollArea className='h-[400px] w-full pt-4'>
+      <div className='space-y-3'>
+        <button
+          type='button'
+          onClick={() => applyPreset(NONE_PRESET, trackItem)}
+          className='flex w-full cursor-pointer flex-col items-center gap-1'
+        >
+          <span className='flex w-full items-center justify-center rounded border border-transparent bg-gray-700/50 p-3 transition-colors hover:border-white/40'>
+            <CircleOff className='h-5 w-5 text-gray-400' />
+          </span>
+          <span className='text-xs text-gray-300'>No captions</span>
+        </button>
 
-          {/* Preset Options */}
-          {TEXT_PRESETS.map((preset, index) => (
-            <div
-              key={index}
-              onClick={() => applyPreset(preset, trackItem)}
-              className='flex h-[60px] cursor-pointer items-center justify-center'
-            >
-              <div className='flex flex-col items-center justify-center gap-1 w-full'>
-                <div className='bg-gray-700/50 transition-colors w-full p-2 flex items-center relative justify-center rounded border border-transparent hover:border-white/40'>
-                  <div
-                    style={{
-                      backgroundColor: preset.backgroundColor,
-                      color: preset.color,
-                      borderRadius: `${preset.borderRadius}px`,
-                      border: preset.borderWidth > 0 ? `${preset.borderWidth}px solid ${preset.borderColor}` : 'none',
-                      textShadow: getTextShadow(preset.boxShadow),
-                      filter:
-                        preset.boxShadow && preset.boxShadow.blur > 10
-                          ? `drop-shadow(0 0 ${preset.boxShadow.blur}px ${preset.boxShadow.color})`
-                          : 'none',
-                    }}
-                    className='text-sm font-bold px-3 py-1 text-center leading-tight '
-                  >
-                    {getPresetDisplayText(preset)}
-                  </div>
-                </div>
-                <span className='text-xs text-gray-400'>{preset.name}</span>
-              </div>
-            </div>
-          ))}
-        </div>
-      </ScrollArea>
-    </div>
+        {TEXT_PRESETS.map(preset => (
+          <button
+            type='button'
+            key={preset.name}
+            onClick={() => applyPreset(preset, trackItem)}
+            className='flex h-[60px] w-full cursor-pointer flex-col items-center justify-center gap-1'
+          >
+            <span className='relative flex w-full items-center justify-center rounded border border-transparent bg-gray-700/50 p-2 transition-colors hover:border-white/40'>
+              <span
+                style={{
+                  backgroundColor: preset.backgroundColor,
+                  color: preset.color,
+                  borderRadius: `${preset.borderRadius}px`,
+                  border: preset.borderWidth > 0 ? `${preset.borderWidth}px solid ${preset.borderColor}` : 'none',
+                  textShadow: getTextShadow(preset.boxShadow),
+                  filter:
+                    preset.boxShadow && preset.boxShadow.blur > 10
+                      ? `drop-shadow(0 0 ${preset.boxShadow.blur}px ${preset.boxShadow.color})`
+                      : 'none',
+                }}
+                className='px-3 py-1 text-center text-sm font-bold leading-tight'
+              >
+                {DISPLAY_TEXT[preset.style ?? ''] ?? preset.name}
+              </span>
+            </span>
+            <span className='text-xs text-gray-400'>{preset.name}</span>
+          </button>
+        ))}
+      </div>
+    </ScrollArea>
   );
 }

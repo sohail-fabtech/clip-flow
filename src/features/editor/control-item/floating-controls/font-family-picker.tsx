@@ -17,9 +17,9 @@ export const FontList = ({ search, onSelect }: { search: string; onSelect: (font
       type='button'
       key={font.family}
       onClick={() => onSelect(font)}
-      className='block w-full cursor-pointer px-2 py-1 hover:bg-zinc-800/50'
+      className='block w-full cursor-pointer truncate px-2 py-1.5 text-left text-sm hover:bg-zinc-800/50'
     >
-      <img className='invert' src={font.default.preview} alt={font.family} />
+      {font.family}
     </button>
   ));
 };

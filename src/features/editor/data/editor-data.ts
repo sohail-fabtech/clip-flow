@@ -1,14 +1,13 @@
 export const UPLOAD_DATA = [
-  // Videos
   {
     id: 'video-1',
     fileName: 'beach_vacation.mp4',
-    filePath: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
+    filePath: 'https://videos.pexels.com/video-files/6963395/6963395-sd_240_426_25fps.mp4',
     fileSize: 15728640, // 15MB
     contentType: 'video/mp4',
     metadata: {
-      originalUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4',
-      thumbnailUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/BigBuckBunny.jpg',
+      originalUrl: 'https://videos.pexels.com/video-files/6963395/6963395-sd_240_426_25fps.mp4',
+      thumbnailUrl: 'https://images.pexels.com/videos/6963395/eco-friendly-environment-environmentally-friendly-mothernature-6963395.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=1200&w=630',
     },
     folder: 'vacation',
     type: 'video',
@@ -19,13 +18,13 @@ export const UPLOAD_DATA = [
   },
   {
     id: 'video-2',
-    fileName: 'product_demo.webm',
-    filePath: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
+    fileName: 'product_demo.mp4',
+    filePath: 'https://videos.pexels.com/video-files/5386411/5386411-sd_226_426_25fps.mp4',
     fileSize: 8388608, // 8MB
-    contentType: 'video/webm',
+    contentType: 'video/mp4',
     metadata: {
-      originalUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4',
-      thumbnailUrl: 'https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/images/ElephantsDream.jpg',
+      originalUrl: 'https://videos.pexels.com/video-files/5386411/5386411-sd_226_426_25fps.mp4',
+      thumbnailUrl: 'https://images.pexels.com/videos/5386411/pexels-photo-5386411.jpeg?auto=compress&cs=tinysrgb&fit=crop&h=1200&w=630',
     },
     folder: 'marketing',
     type: 'video',
@@ -35,7 +34,6 @@ export const UPLOAD_DATA = [
     isPreview: false,
   },
 
-  // Images
   {
     id: 'image-1',
     fileName: 'profile_pic.jpg',
@@ -85,7 +83,6 @@ export const UPLOAD_DATA = [
     isPreview: false,
   },
 
-  // Audio
   {
     id: 'audio-1',
     fileName: 'interview.mp3',

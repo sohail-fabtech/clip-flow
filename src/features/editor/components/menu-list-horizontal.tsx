@@ -1,101 +1,46 @@
 import useLayoutStore from '@/features/editor/stores/use-layout-store';
-import { Icons } from '@/components/shared/icons';
-import { cn } from '@/lib/utils';
-import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerDescription } from '@/components/ui/drawer';
-import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
-import { VisuallyHidden } from '@/components/ui/visually-hidden';
-import { MenuItem } from '@/features/editor/menu-item/menu-item';
-import { useIsLargeScreen } from '@/features/editor/hooks/use-media-query';
 import { Button } from '@/components/ui/button';
-
-// Menu items configuration
-const menuItems = [
-  {
-    id: 'texts',
-    label: 'Text',
-    icon: Icons.type,
-  },
-  {
-    id: 'videos',
-    label: 'Video',
-    icon: Icons.video,
-  },
-  {
-    id: 'images',
-    label: 'Images',
-    icon: Icons.image,
-  },
-  {
-    id: 'audios',
-    label: 'Audio',
-    icon: Icons.audio,
-  },
-];
-
-// Reusable MenuButton component
-function MenuButton({ item, isActive, onClick }) {
-  return (
-    <Button onClick={onClick} variant={isActive ? 'default' : 'ghost'} size={'sm'} className='text-muted-foreground'>
-      {item.label}
-    </Button>
-  );
-}
+import { Drawer, DrawerContent, DrawerDescription, DrawerTitle } from '@/components/ui/drawer';
+import { ScrollArea, ScrollBar } from '@/components/ui/scroll-area';
+import { MenuItem } from '@/features/editor/menu-item/menu-item';
+import { MENU_ITEMS } from '@/features/editor/menu-item/menu-config';
 
 export default function MenuListHorizontal() {
-  const { setActiveMenuItem, setShowMenuItem, activeMenuItem, showMenuItem, drawerOpen, setDrawerOpen } =
-    useLayoutStore();
-
-  const isLargeScreen = useIsLargeScreen();
-
-  const handleMenuItemClick = menuItem => {
-    setActiveMenuItem(menuItem);
-    // Use drawer on mobile, sidebar on desktop
-    if (!isLargeScreen) {
-      setDrawerOpen(true);
-    } else {
-      setShowMenuItem(true);
-    }
-  };
-
-  const isMenuItemActive = itemId => {
-    return (drawerOpen && activeMenuItem === itemId) || (showMenuItem && activeMenuItem === itemId);
-  };
+  const { activeMenuItem, setActiveMenuItem, drawerOpen, setDrawerOpen } = useLayoutStore();
 
   return (
     <>
-      <div className='flex h-12 items-center border-t !border-red-500'>
+      <div className='flex h-12 items-center border-t border-white/10'>
         <ScrollArea className='w-full px-2'>
-          <div className='flex items-center justify-center space-x-4 min-w-max px-4'>
-            {menuItems.map(item => (
-              <MenuButton
-                key={item.id}
-                item={item}
-                isActive={isMenuItemActive(item.id)}
-                onClick={() => handleMenuItemClick(item.id)}
-              />
+          <div className='flex min-w-max items-center justify-center space-x-4 px-4'>
+            {MENU_ITEMS.map(({ id, label }) => (
+              <Button
+                key={id}
+                onClick={() => {
+                  setActiveMenuItem(id);
+                  setDrawerOpen(true);
+                }}
+                variant={drawerOpen && activeMenuItem === id ? 'secondary' : 'ghost'}
+                size='sm'
+                className='text-muted-foreground'
+              >
+                {label}
+              </Button>
             ))}
           </div>
           <ScrollBar orientation='horizontal' />
         </ScrollArea>
       </div>
 
-      {/* Drawer only on mobile/tablet - conditionally mounted */}
-      {!isLargeScreen && (
-        <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
-          <DrawerContent className='max-h-[80vh] min-h-[340px] mt-0'>
-            <VisuallyHidden>
-              <DrawerHeader>
-                <DrawerTitle>Menu Options</DrawerTitle>
-                <DrawerDescription>Select from available menu options</DrawerDescription>
-              </DrawerHeader>
-            </VisuallyHidden>
-
-            <div className='flex-1'>
-              <MenuItem />
-            </div>
-          </DrawerContent>
-        </Drawer>
-      )}
+      <Drawer open={drawerOpen} onOpenChange={setDrawerOpen}>
+        <DrawerContent className='mt-0 max-h-[80vh] min-h-[340px]'>
+          <DrawerTitle className='sr-only'>{MENU_ITEMS.find(item => item.id === activeMenuItem)?.label}</DrawerTitle>
+          <DrawerDescription className='sr-only'>Editor panel</DrawerDescription>
+          <div className='flex-1 overflow-auto'>
+            <MenuItem />
+          </div>
+        </DrawerContent>
+      </Drawer>
     </>
   );
 }

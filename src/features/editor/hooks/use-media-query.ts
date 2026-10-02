@@ -1,38 +1,21 @@
-import { useState, useEffect } from 'react';
+import { useCallback, useSyncExternalStore } from 'react';
 
-export function useMediaQuery(query) {
-  const [matches, setMatches] = useState(false);
-
-  useEffect(() => {
-    const media = window.matchMedia(query);
-
-    // Set initial value
-    setMatches(media.matches);
-
-    // Create event listener
-    const listener = event => {
-      setMatches(event.matches);
-    };
-
-    // Add listener
-    media.addEventListener('change', listener);
-
-    // Cleanup
-    return () => media.removeEventListener('change', listener);
-  }, [query]);
-
-  return matches;
+export function useMediaQuery(query: string) {
+  const subscribe = useCallback(
+    (onChange: () => void) => {
+      const media = window.matchMedia(query);
+      media.addEventListener('change', onChange);
+      return () => media.removeEventListener('change', onChange);
+    },
+    [query],
+  );
+  return useSyncExternalStore(
+    subscribe,
+    () => window.matchMedia(query).matches,
+    () => false,
+  );
 }
 
-// Predefined breakpoint hooks
-export function useIsLargeScreen() {
-  return useMediaQuery('(min-width: 1024px)');
-}
+export const useIsLargeScreen = () => useMediaQuery('(min-width: 1024px)');
 
-export function useIsMediumScreen() {
-  return useMediaQuery('(min-width: 768px)');
-}
-
-export function useIsSmallScreen() {
-  return useMediaQuery('(max-width: 767px)');
-}
+export const useIsSmallScreen = () => useMediaQuery('(max-width: 767px)');

@@ -19,7 +19,6 @@ export const Texts = () => {
       options: { size },
     });
 
-    console.log('Added text with payload:', TEXT_ADD_PAYLOAD);
   };
 
   const handleAddBodyText = () => {
@@ -28,7 +27,6 @@ export const Texts = () => {
       options: { size },
     });
 
-    console.log('Added body text with payload:', TEXT_BODY_ADD_PAYLOAD);
   };
 
   const handleAddCaption = () => {
@@ -63,7 +61,6 @@ export const Texts = () => {
       options: { size },
     });
 
-    console.log('Added caption with payload:', captionPayload);
   };
 
   return (

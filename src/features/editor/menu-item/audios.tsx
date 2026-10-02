@@ -1,29 +1,22 @@
+import { Music } from 'lucide-react';
+import { dispatch } from '@designcombo/events';
+import { ADD_AUDIO } from '@designcombo/state';
+import { generateId } from '@designcombo/timeline';
 import Draggable from '@/components/shared/draggable';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { HorizontalScroll } from '@/components/ui/horizontal-scroll';
-import { dispatch } from '@designcombo/events';
-import { ADD_AUDIO, ADD_ITEMS } from '@designcombo/state';
-import { Music } from 'lucide-react';
-import { useIsDraggingOverTimeline } from '@/features/editor/hooks/use-is-dragging-over-timeline';
-import React from 'react';
-import { generateId } from '@designcombo/timeline';
-import { AUDIOS } from '@/features/editor/data/audio';
 import { Separator } from '@/components/ui/separator';
+import { useIsDraggingOverTimeline } from '@/features/editor/hooks/use-is-dragging-over-timeline';
+import { AUDIOS } from '@/features/editor/data/audio';
+
+type AudioTrack = (typeof AUDIOS)[number];
+
 
 export const Audios = () => {
   const isDraggingOverTimeline = useIsDraggingOverTimeline();
 
-  const handleAddAudio = payload => {
-    payload.id = generateId();
-    dispatch(ADD_AUDIO, {
-      payload,
-      options: {},
-    });
+  const handleAddAudio = (audio: AudioTrack) =>
+    dispatch(ADD_AUDIO, { payload: { ...audio, id: generateId() }, options: {} });
 
-    console.log('Added audio with payload:', payload);
-  };
-
-  // Main view
   return (
     <div className='flex flex-col bg-[#27272A] rounded-[5px] text-white'>
       <h1 className='text-sm p-3'>Music</h1>
@@ -36,7 +29,7 @@ export const Audios = () => {
                 shouldDisplayPreview={!isDraggingOverTimeline}
                 handleAddAudio={handleAddAudio}
                 audio={audio}
-                key={index}
+                key={audio.id ?? index}
               />
             );
           })}
@@ -46,19 +39,19 @@ export const Audios = () => {
   );
 };
 
-const AudioItem = ({ handleAddAudio, audio, shouldDisplayPreview }) => {
-  const style = React.useMemo(
-    () => ({
-      backgroundImage: 'url(https://cdn.designcombo.dev/thumbnails/music-preview.png)',
-      backgroundSize: 'cover',
-      width: '70px',
-      height: '70px',
-    }),
-    [],
-  );
+interface AudioItemProps {
+  audio: AudioTrack;
+  shouldDisplayPreview: boolean;
+  handleAddAudio: (audio: AudioTrack) => void;
+}
 
+const AudioItem = ({ handleAddAudio, audio, shouldDisplayPreview }: AudioItemProps) => {
   return (
-    <Draggable data={audio} renderCustomPreview={<div style={style} />} shouldDisplayPreview={shouldDisplayPreview}>
+    <Draggable data={audio} renderCustomPreview={
+        <div className='flex h-[70px] w-[70px] items-center justify-center rounded bg-[#27272A] text-white'>
+          <Music width={24} />
+        </div>
+      } shouldDisplayPreview={shouldDisplayPreview}>
       <div
         draggable={false}
         onClick={() => handleAddAudio(audio)}
@@ -74,7 +67,6 @@ const AudioItem = ({ handleAddAudio, audio, shouldDisplayPreview }) => {
         <div className='flex flex-col justify-center'>
           <div>{audio.name}</div>
           <div className='text-zinc-400'>{audio.metadata?.author}</div>
-          {audio.metadata?.mood && <div className='text-xs text-zinc-500'>{audio.metadata.mood}</div>}
         </div>
       </div>
     </Draggable>

@@ -12,7 +12,7 @@ import Resize from '@/features/editor/components/resize';
 import Timeline from '@/features/editor/timeline';
 import Scene, { type SceneHandle } from '@/features/editor/scene';
 import CropModal from '@/features/editor/crop-modal/crop-modal';
-import { MenuItem } from '@/features/editor/menu-item';
+import { MenuItem } from '@/features/editor/menu-item/menu-item';
 import FloatingControl from '@/features/editor/control-item/floating-controls/floating-control';
 import useStore from '@/features/editor/stores/use-store';
 import useDataState from '@/features/editor/stores/use-data-state';

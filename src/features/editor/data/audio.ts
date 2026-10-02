@@ -1,117 +1,58 @@
 export const AUDIOS = [
-  // https://ik.imagekit.io/pablituuu/like_a_player.mp3?updatedAt=1722278521488
   {
-    id: 'xxx0',
-    details: {
-      src: 'https://cdn.designcombo.dev/audio/OpenAI%20CEO%20on%20Artificial%20Intelligence%20Changing%20Society.mp3',
-    },
-    name: 'Open AI',
+    id: 'soundhelix-1',
+    details: { src: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3' },
+    name: 'SoundHelix Song 1',
     type: 'audio',
-    metadata: {
-      author: 'Open AI',
-    },
+    metadata: { author: 'T. Schürger' },
   },
   {
-    id: 'xx1',
-    details: {
-      src: 'https://cdn.designcombo.dev/audio/Dawn%20of%20change.mp3',
-    },
-    name: 'Dawn of change',
+    id: 'soundhelix-2',
+    details: { src: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3' },
+    name: 'SoundHelix Song 2',
     type: 'audio',
-    metadata: {
-      author: 'Roman Senyk',
-    },
+    metadata: { author: 'T. Schürger' },
   },
   {
-    id: 'xx2',
-    details: {
-      src: 'https://cdn.designcombo.dev/audio/Hope.mp3',
-    },
-    name: 'Hope',
+    id: 'soundhelix-3',
+    details: { src: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3' },
+    name: 'SoundHelix Song 3',
     type: 'audio',
-    metadata: {
-      author: 'Hugo Dujardin',
-    },
+    metadata: { author: 'T. Schürger' },
   },
   {
-    id: 'xx3',
-    details: {
-      src: 'https://cdn.designcombo.dev/audio/Tenderness.mp3',
-    },
-    name: 'Tenderness',
+    id: 'soundhelix-4',
+    details: { src: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-4.mp3' },
+    name: 'SoundHelix Song 4',
     type: 'audio',
-    metadata: {
-      author: 'Benjamin Tissot',
-    },
+    metadata: { author: 'T. Schürger' },
   },
   {
-    id: 'xx4',
-    details: {
-      src: 'https://cdn.designcombo.dev/audio/Piano%20Moment.mp3',
-    },
-    name: 'Piano moment',
+    id: 'soundhelix-5',
+    details: { src: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-5.mp3' },
+    name: 'SoundHelix Song 5',
     type: 'audio',
-    metadata: {
-      author: 'Benjamin Tissot',
-    },
-  },
-
-  //
-  {
-    id: 'xxx0',
-    details: {
-      src: 'https://cdn.designcombo.dev/audio/OpenAI%20CEO%20on%20Artificial%20Intelligence%20Changing%20Society.mp3',
-    },
-    name: 'Open AI',
-    type: 'audio',
-    metadata: {
-      author: 'Open AI',
-    },
+    metadata: { author: 'T. Schürger' },
   },
   {
-    id: 'xx1',
-    details: {
-      src: 'https://cdn.designcombo.dev/audio/Dawn%20of%20change.mp3',
-    },
-    name: 'Dawn of change',
+    id: 'soundhelix-6',
+    details: { src: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-6.mp3' },
+    name: 'SoundHelix Song 6',
     type: 'audio',
-    metadata: {
-      author: 'Roman Senyk',
-    },
+    metadata: { author: 'T. Schürger' },
   },
   {
-    id: 'xx2',
-    details: {
-      src: 'https://cdn.designcombo.dev/audio/Hope.mp3',
-    },
-    name: 'Hope',
+    id: 'soundhelix-7',
+    details: { src: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-7.mp3' },
+    name: 'SoundHelix Song 7',
     type: 'audio',
-    metadata: {
-      author: 'Hugo Dujardin',
-    },
+    metadata: { author: 'T. Schürger' },
   },
   {
-    id: 'xx3',
-    details: {
-      src: 'https://cdn.designcombo.dev/audio/Tenderness.mp3',
-    },
-    name: 'Tenderness',
+    id: 'soundhelix-8',
+    details: { src: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-8.mp3' },
+    name: 'SoundHelix Song 8',
     type: 'audio',
-    metadata: {
-      author: 'Benjamin Tissot',
-    },
+    metadata: { author: 'T. Schürger' },
   },
-  {
-    id: 'xx4',
-    details: {
-      src: 'https://cdn.designcombo.dev/audio/Piano%20Moment.mp3',
-    },
-    name: 'Piano moment',
-    type: 'audio',
-    metadata: {
-      author: 'Benjamin Tissot',
-    },
-  },
-
-  //
 ];

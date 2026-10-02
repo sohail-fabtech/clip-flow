@@ -14,11 +14,9 @@ export function AIEnhance() {
   ];
   return (
     <div className='flex flex-col bg-[#27272A] rounded-md text-white'>
-      {/* Header */}
       <h1 className='text-sm p-3'>AI Enhance</h1>
       <Separator className='w-full bg-white/40' />
 
-      {/* List items */}
       <div className='flex flex-col gap-1 py-2'>
         {items.map((item, idx) => (
           <div

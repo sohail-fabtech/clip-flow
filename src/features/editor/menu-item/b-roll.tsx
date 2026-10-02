@@ -7,7 +7,6 @@ export function BRoll() {
       <h1 className='text-sm p-3'>B-Roll</h1>
       <Separator className='w-full bg-white/60' />
 
-      {/* content */}
       <div className='p-2'>Content for B-Roll</div>
     </div>
   );

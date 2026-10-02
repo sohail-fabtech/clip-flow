@@ -13,7 +13,6 @@ import {
 } from '@/features/editor/constants/events';
 import { getSafeCurrentFrame } from '@/features/editor/utils/time';
 
-
 const useTimelineEvents = () => {
   const playerRef = useStore(state => state.playerRef);
   const fps = useStore(state => state.fps);
