@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import SliderControl from '@/features/editor/control-item/common/slider-control';
 import { dispatch } from '@designcombo/events';
 import { EDIT_OBJECT } from '@designcombo/state';
 import { Button } from '@/components/ui/button';
@@ -8,11 +9,8 @@ import { Label } from '@/components/ui/label';
 
 // Common controls used across properties panes
 import AspectRatio from '@/features/editor/control-item/common/aspect-ratio';
-import Rounded from '@/features/editor/control-item/common/radius';
-import Opacity from '@/features/editor/control-item/common/opacity';
 import Outline from '@/features/editor/control-item/common/outline';
 import Shadow from '@/features/editor/control-item/common/shadow';
-import Volume from '@/features/editor/control-item/common/volume';
 import Speed from '@/features/editor/control-item/common/speed';
 
 const Basic = () => {
@@ -176,10 +174,10 @@ const Basic = () => {
         <div className='flex flex-col gap-2'>
           <Label className='font-sans text-xs font-semibold text-primary'>Basic</Label>
           {/* <AspectRatio /> */}
-          <Volume onChange={v => handleChangeVolume(v)} value={properties.details.volume ?? 100} />
-          <Opacity onChange={v => handleChangeOpacity(v)} value={properties.details.opacity ?? 100} />
+          <SliderControl label='Volume' onChange={v => handleChangeVolume(v)} value={properties.details.volume ?? 100} />
+          <SliderControl label='Opacity' onChange={v => handleChangeOpacity(v)} value={properties.details.opacity ?? 100} />
           <Speed value={properties.playbackRate ?? 1} onChange={handleChangeSpeed} />
-          <Rounded onChange={v => onChangeBorderRadius(v)} value={properties.details.borderRadius} />
+          <SliderControl label='Round' max={50} onChange={v => onChangeBorderRadius(v)} value={properties.details.borderRadius} />
         </div>
 
         <Outline

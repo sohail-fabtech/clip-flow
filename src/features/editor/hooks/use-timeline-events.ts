@@ -13,10 +13,6 @@ import {
 } from '@/features/editor/constants/events';
 import { getSafeCurrentFrame } from '@/features/editor/utils/time';
 
-interface EditorEvent {
-  key: string;
-  value?: { payload?: { time?: number; frames?: number; activeIds?: string[] } };
-}
 
 const useTimelineEvents = () => {
   const playerRef = useStore(state => state.playerRef);
@@ -29,8 +25,8 @@ const useTimelineEvents = () => {
     };
 
     const subscription = subject
-      .pipe(filter(({ key }: EditorEvent) => key.startsWith(PLAYER_PREFIX) || key === TIMELINE_SEEK))
-      .subscribe(({ key, value }: EditorEvent) => {
+      .pipe(filter(({ key }) => key.startsWith(PLAYER_PREFIX) || key === TIMELINE_SEEK))
+      .subscribe(({ key, value }) => {
         const player = playerRef?.current;
         if (!player) return;
         const payload = value?.payload;
@@ -47,8 +43,8 @@ const useTimelineEvents = () => {
 
   useEffect(() => {
     const subscription = subject
-      .pipe(filter(({ key }: EditorEvent) => key.startsWith(LAYER_PREFIX)))
-      .subscribe(({ key, value }: EditorEvent) => {
+      .pipe(filter(({ key }) => key.startsWith(LAYER_PREFIX)))
+      .subscribe(({ key, value }) => {
         if (key === LAYER_SELECTION) setState({ activeIds: value?.payload?.activeIds ?? [] });
       });
     return () => subscription.unsubscribe();

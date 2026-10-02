@@ -1,5 +1,5 @@
 import { ScrollArea } from '@/components/ui/scroll-area';
-import Volume from '@/features/editor/control-item/common/volume';
+import SliderControl from '@/features/editor/control-item/common/slider-control';
 import Speed from '@/features/editor/control-item/common/speed';
 import React, { useState } from 'react';
 import { dispatch } from '@designcombo/events';
@@ -55,7 +55,7 @@ const BasicAudio = ({ trackItem, type }) => {
     },
     {
       key: 'volume',
-      component: <Volume onChange={v => handleChangeVolume(v)} value={properties.details.volume ?? 100} />,
+      component: <SliderControl label='Volume' onChange={v => handleChangeVolume(v)} value={properties.details.volume ?? 100} />,
     },
   ];
 

@@ -43,8 +43,8 @@ const Composition = () => {
 
   useEffect(() => {
     const subscription = subject
-      .pipe(filter(({ key }: { key: string }) => key === ENTER_EDIT_MODE))
-      .subscribe((event: { value?: { payload?: { id?: string } } }) => {
+      .pipe(filter(({ key }) => key === ENTER_EDIT_MODE))
+      .subscribe(event => {
         if (editableTextId) {
           const element = document.querySelector(`[data-text-id="${editableTextId}"]`);
           if (trackItemIds.includes(editableTextId)) {

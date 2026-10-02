@@ -1,4 +1,5 @@
 import { Button } from '@/components/ui/button';
+import SliderControl from '@/features/editor/control-item/common/slider-control';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import useDataState from '@/features/editor/stores/use-data-state';
@@ -6,7 +7,6 @@ import { dispatch } from '@designcombo/events';
 import { EDIT_OBJECT } from '@designcombo/state';
 import { ChevronDown, Search, Strikethrough, Underline, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import Opacity from '@/features/editor/control-item/common/opacity';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { ColorPicker } from '@/components/ui/color-picker';
@@ -42,7 +42,7 @@ export const TextControls = ({
       <TextDecoration value={properties.textDecoration} onChange={onChangeTextDecoration} />
       <FontCase id={trackItem.id} />
 
-      <Opacity onChange={v => handleChangeOpacity(v)} value={properties.opacity ?? 100} />
+      <SliderControl label='Opacity' onChange={v => handleChangeOpacity(v)} value={properties.opacity ?? 100} />
     </div>
   );
 };

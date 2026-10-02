@@ -1,16 +1,13 @@
 import { ScrollArea } from '@/components/ui/scroll-area';
+import SliderControl from '@/features/editor/control-item/common/slider-control';
 import Outline from '@/features/editor/control-item/common/outline';
 import Shadow from '@/features/editor/control-item/common/shadow';
-import Opacity from '@/features/editor/control-item/common/opacity';
-import Rounded from '@/features/editor/control-item/common/radius';
 import AspectRatio from '@/features/editor/control-item/common/aspect-ratio';
 import { Button } from '@/components/ui/button';
 import { Crop } from 'lucide-react';
 import React, { useEffect, useState } from 'react';
 import { dispatch } from '@designcombo/events';
 import { EDIT_OBJECT } from '@designcombo/state';
-import Blur from '@/features/editor/control-item/common/blur';
-import Brightness from '@/features/editor/control-item/common/brightness';
 import useLayoutStore from '@/features/editor/stores/use-layout-store';
 import { Label } from '@/components/ui/label';
 
@@ -195,11 +192,11 @@ const BasicImage = ({ trackItem, type }) => {
           <Label className='font-sans text-xs font-semibold'>Basic</Label>
 
           <AspectRatio />
-          <Rounded onChange={v => onChangeBorderRadius(v)} value={properties.details.borderRadius} />
-          <Opacity onChange={v => handleChangeOpacity(v)} value={properties.details.opacity ?? 100} />
+          <SliderControl label='Round' max={50} onChange={v => onChangeBorderRadius(v)} value={properties.details.borderRadius} />
+          <SliderControl label='Opacity' onChange={v => handleChangeOpacity(v)} value={properties.details.opacity ?? 100} />
 
-          <Blur onChange={v => onChangeBlur(v)} value={properties.details.blur ?? 0} />
-          <Brightness onChange={v => onChangeBrightness(v)} value={properties.details.brightness ?? 100} />
+          <SliderControl label='Blur' onChange={v => onChangeBlur(v)} value={properties.details.blur ?? 0} />
+          <SliderControl label='Brightness' onChange={v => onChangeBrightness(v)} value={properties.details.brightness ?? 100} />
         </div>
       ),
     },

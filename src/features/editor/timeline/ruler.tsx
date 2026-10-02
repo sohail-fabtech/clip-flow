@@ -1,5 +1,4 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
-
+import { useEffect, useRef, useState, type PointerEvent } from 'react';
 import {
   PREVIEW_FRAME_WIDTH,
   SECONDARY_FONT,
@@ -8,396 +7,114 @@ import {
 } from '@/features/editor/constants/constants';
 import { formatTimelineUnit } from '@/features/editor/utils/format';
 import useStore from '@/features/editor/stores/use-store';
-import { debounce } from 'lodash';
 import { useTimelineOffsetX } from '@/features/editor/hooks/use-timeline-offset';
 
-const Ruler = props => {
-  const timelineOffsetX = useTimelineOffsetX();
-  const {
-    height = 40, // Increased height to give space for the text
-    longLineSize = 8,
-    shortLineSize = 10,
-    offsetX = timelineOffsetX + TIMELINE_OFFSET_CANVAS_LEFT,
-    textOffsetY = 17, // Place the text above the lines but inside the canvas
-    textFormat = formatTimelineUnit,
-    scrollLeft = 0,
-    onClick,
-    onScroll,
-  } = props;
-  const { scale } = useStore();
-  const canvasRef = useRef(null);
-  const [canvasContext, setCanvasContext] = useState(null);
-  const [canvasSize, setCanvasSize] = useState({
-    width: 0,
-    height: height, // Increased height for text space
-  });
+const HEIGHT = 40;
+const SHORT_LINE = 10;
+const LINE_ORIGIN_Y = 18;
+const TEXT_OFFSET_Y = 17;
+const DRAG_THRESHOLD = 5;
 
-  // Drag state
-  const [isDragging, setIsDragging] = useState(false);
-  const [hasDragged, setHasDragged] = useState(false);
-  const dragRef = useRef({
-    startX: 0,
-    startScrollPos: 0,
-    isDragging: false,
-    hasDragged: false,
-  });
+interface RulerProps {
+  scrollLeft: number;
+  onClick: (units: number) => void;
+  onScroll: (scrollLeft: number) => void;
+}
+
+const Ruler = ({ scrollLeft, onClick, onScroll }: RulerProps) => {
+  const timelineOffsetX = useTimelineOffsetX();
+  const scale = useStore(state => state.scale);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const dragRef = useRef<{ startX: number; startScroll: number; dragged: boolean } | null>(null);
+  const [dragging, setDragging] = useState(false);
+  const offsetX = timelineOffsetX + TIMELINE_OFFSET_CANVAS_LEFT;
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    if (canvas) {
-      const context = canvas.getContext('2d');
-      setCanvasContext(context);
-      resize(canvas, context, scrollLeft);
-    }
-  }, [timelineOffsetX]);
-
-  const handleResize = useCallback(() => {
-    resize(canvasRef.current, canvasContext, scrollLeft);
-  }, [canvasContext, scrollLeft, timelineOffsetX]);
-
-  useEffect(() => {
-    const resizeHandler = debounce(handleResize, 200);
-    window.addEventListener('resize', resizeHandler);
-
-    return () => {
-      window.removeEventListener('resize', resizeHandler);
-    };
-  }, [handleResize]);
-
-  useEffect(() => {
-    if (canvasContext) {
-      resize(canvasRef.current, canvasContext, scrollLeft);
-    }
-  }, [canvasContext, scrollLeft, scale, timelineOffsetX]);
-
-  const resize = (canvas, context, scrollLeft) => {
+    const context = canvas?.getContext('2d');
     if (!canvas || !context) return;
 
-    const offsetParent = canvas.offsetParent;
-    const width = offsetParent?.offsetWidth ?? canvas.offsetWidth;
-    const height = canvasSize.height;
+    const draw = () => {
+      const width = canvas.offsetParent instanceof HTMLElement ? canvas.offsetParent.offsetWidth : canvas.offsetWidth;
+      canvas.width = width;
+      canvas.height = HEIGHT;
 
-    canvas.width = width;
-    canvas.height = height;
+      const { zoom, unit, segments } = scale;
+      const zoomUnit = unit * zoom * PREVIEW_FRAME_WIDTH;
+      const minRange = Math.floor(scrollLeft / zoomUnit);
+      const maxRange = Math.ceil((scrollLeft + width) / zoomUnit);
 
-    draw(context, scrollLeft, width, height);
-    setCanvasSize({ width, height });
-  };
+      context.clearRect(0, 0, width, HEIGHT);
+      context.save();
+      context.fillStyle = '#71717a';
+      context.strokeStyle = '#52525b';
+      context.lineWidth = 1;
+      context.font = `${SMALL_FONT_SIZE}px ${SECONDARY_FONT}`;
+      context.textBaseline = 'top';
+      context.translate(0.5, 0);
 
-  const draw = (context, scrollLeft, width, height) => {
-    const zoom = scale.zoom;
-    const unit = scale.unit;
-    const segments = scale.segments;
-    context.clearRect(0, 0, width, height);
-    context.save();
-    context.strokeStyle = '#71717a';
-    context.fillStyle = '#71717a';
-    context.lineWidth = 1;
-    context.font = `${SMALL_FONT_SIZE}px ${SECONDARY_FONT}`;
-    context.textBaseline = 'top';
+      for (let value = Math.max(0, minRange); value <= maxRange; value++) {
+        const startPos = value * zoomUnit - scrollLeft;
+        if (startPos < -zoomUnit || startPos >= width + zoomUnit) continue;
+        const text = formatTimelineUnit(value * zoomUnit / zoom);
+        context.fillText(text, startPos + offsetX - context.measureText(text).width / 2, TEXT_OFFSET_Y);
 
-    context.translate(0.5, 0);
-    context.beginPath();
-
-    const zoomUnit = unit * zoom * PREVIEW_FRAME_WIDTH;
-    const minRange = Math.floor(scrollLeft / zoomUnit);
-    const maxRange = Math.ceil((scrollLeft + width) / zoomUnit);
-    const length = maxRange - minRange;
-
-    // Draw text before drawing the lines
-    for (let i = 0; i <= length; ++i) {
-      const value = i + minRange;
-
-      if (value < 0) continue;
-
-      const startValue = (value * zoomUnit) / zoom;
-      const startPos = (startValue - scrollLeft / zoom) * zoom;
-
-      if (startPos < -zoomUnit || startPos >= width + zoomUnit) continue;
-      const text = textFormat(startValue);
-
-      // Calculate the textOffsetX value
-      const textWidth = context.measureText(text).width;
-      const textOffsetX = -textWidth / 2;
-
-      // Adjust textOffsetY so it stays inside the canvas but above the lines
-      context.fillText(text, startPos + textOffsetX + offsetX, textOffsetY);
-    }
-
-    // Draw long and short lines after the text
-    for (let i = 0; i <= length; ++i) {
-      const value = i + minRange;
-
-      if (value < 0) continue;
-
-      const startValue = value * zoomUnit;
-      const startPos = startValue - scrollLeft + offsetX;
-
-      for (let j = 0; j < segments; ++j) {
-        const pos = startPos + (j / segments) * zoomUnit;
-
-        if (pos < 0 || pos >= width) continue;
-
-        const lineSize = j % segments ? shortLineSize : longLineSize;
-
-        // Set color based on line size
-        if (lineSize === shortLineSize) {
-          context.strokeStyle = '#52525b'; // Yellow for short lines
-        } else {
-          context.strokeStyle = '#18181b'; // Red for long lines
-        }
-
-        const origin = 18; // Increase the origin to start lines lower, below the text
-
-        const [x1, y1] = [pos, origin];
-        const [x2, y2] = [x1, y1 + lineSize];
-
-        context.beginPath(); // Begin a new path for each line
-        context.moveTo(x1, y1);
-        context.lineTo(x2, y2);
-
-        // Set color based on line size
-        if (lineSize === shortLineSize) {
-          context.stroke(); // Draw the line
+        for (let segment = 1; segment < segments; segment++) {
+          const x = startPos + offsetX + (segment / segments) * zoomUnit;
+          if (x < 0 || x >= width) continue;
+          context.beginPath();
+          context.moveTo(x, LINE_ORIGIN_Y);
+          context.lineTo(x, LINE_ORIGIN_Y + SHORT_LINE);
+          context.stroke();
         }
       }
-    }
-
-    context.restore();
-  };
-
-  const handleMouseDown = event => {
-    console.log('Ruler mouse down');
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const rect = canvas.getBoundingClientRect();
-    const clickX = event.clientX - rect.left;
-
-    setIsDragging(true);
-    setHasDragged(false);
-
-    // Update ref state
-    dragRef.current = {
-      startX: clickX,
-      startScrollPos: scrollLeft,
-      isDragging: true,
-      hasDragged: false,
+      context.restore();
     };
 
-    // Prevent text selection during drag
-    event.preventDefault();
+    draw();
+    const observer = new ResizeObserver(draw);
+    if (canvas.offsetParent) observer.observe(canvas.offsetParent);
+    return () => observer.disconnect();
+  }, [scale, scrollLeft, offsetX]);
+
+  const onPointerDown = (event: PointerEvent<HTMLCanvasElement>) => {
+    event.currentTarget.setPointerCapture(event.pointerId);
+    dragRef.current = { startX: event.clientX, startScroll: scrollLeft, dragged: false };
+    setDragging(true);
   };
 
-  const handleTouchStart = event => {
-    console.log('Ruler touch start');
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-
-    const rect = canvas.getBoundingClientRect();
-    const touch = event.touches[0];
-    const touchX = touch.clientX - rect.left;
-
-    setIsDragging(true);
-    setHasDragged(false);
-
-    // Update ref state
-    dragRef.current = {
-      startX: touchX,
-      startScrollPos: scrollLeft,
-      isDragging: true,
-      hasDragged: false,
-    };
-
-    // Prevent default touch behavior
-    event.preventDefault();
+  const onPointerMove = (event: PointerEvent<HTMLCanvasElement>) => {
+    const drag = dragRef.current;
+    if (!drag) return;
+    const delta = drag.startX - event.clientX;
+    if (!drag.dragged && Math.abs(delta) <= DRAG_THRESHOLD) return;
+    drag.dragged = true;
+    onScroll(Math.max(0, drag.startScroll + delta));
   };
 
-  const handleMouseMove = useCallback(
-    event => {
-      if (!dragRef.current.isDragging) return;
-
-      const canvas = canvasRef.current;
-      if (!canvas) return;
-
-      const rect = canvas.getBoundingClientRect();
-      const currentX = event.clientX - rect.left;
-      const deltaX = Math.abs(dragRef.current.startX - currentX);
-
-      // Only start dragging if we've moved more than 5 pixels
-      if (deltaX > 5) {
-        dragRef.current.hasDragged = true;
-        setHasDragged(true);
-        console.log('Ruler mouse move', dragRef.current.isDragging);
-
-        const newScrollLeft = Math.max(0, dragRef.current.startScrollPos + (dragRef.current.startX - currentX));
-
-        console.log('New scroll left:', newScrollLeft);
-        onScroll?.(newScrollLeft);
-      }
-    },
-    [onScroll],
-  );
-
-  const handleTouchMove = useCallback(
-    event => {
-      if (!dragRef.current.isDragging) return;
-
-      const canvas = canvasRef.current;
-      if (!canvas) return;
-
-      const rect = canvas.getBoundingClientRect();
-      const touch = event.touches[0];
-      const currentX = touch.clientX - rect.left;
-      const deltaX = Math.abs(dragRef.current.startX - currentX);
-
-      // Only start dragging if we've moved more than 5 pixels
-      if (deltaX > 5) {
-        dragRef.current.hasDragged = true;
-        setHasDragged(true);
-        console.log('Ruler touch move', dragRef.current.isDragging);
-
-        const newScrollLeft = Math.max(0, dragRef.current.startScrollPos + (dragRef.current.startX - currentX));
-
-        console.log('New scroll left:', newScrollLeft);
-        onScroll?.(newScrollLeft);
-      }
-    },
-    [onScroll],
-  );
-
-  const handleMouseUp = useCallback(() => {
-    console.log('Ruler mouse up', dragRef.current.isDragging, dragRef.current.hasDragged);
-    if (dragRef.current.isDragging) {
-      dragRef.current.isDragging = false;
-      dragRef.current.hasDragged = false;
-      setIsDragging(false);
-      setHasDragged(false);
-    }
-  }, []);
-
-  const handleTouchEnd = useCallback(() => {
-    console.log('Ruler touch end', dragRef.current.isDragging, dragRef.current.hasDragged);
-    if (dragRef.current.isDragging) {
-      dragRef.current.isDragging = false;
-      dragRef.current.hasDragged = false;
-      setIsDragging(false);
-      setHasDragged(false);
-    }
-  }, []);
-
-  const handleLocalMouseUp = event => {
-    console.log('Ruler local mouse up');
-
-    // Check if we dragged before resetting state
-    const wasDragging = dragRef.current.isDragging;
-    const hadDragged = dragRef.current.hasDragged;
-
-    // Always reset drag state on local mouse up
-    if (wasDragging) {
-      dragRef.current.isDragging = false;
-      dragRef.current.hasDragged = false;
-      setIsDragging(false);
-      setHasDragged(false);
-    }
-
-    // Only handle click if we haven't dragged at all
-    if (!hadDragged) {
-      console.log('Ruler click - seeking to position');
-      const canvas = canvasRef.current;
-      if (!canvas) return;
-
-      // Get the bounding box of the canvas to calculate the relative click position
-      const rect = canvas.getBoundingClientRect();
-      const clickX = event.clientX - rect.left;
-
-      // Calculate total x position, including scrollLeft
-      const totalX = clickX + scrollLeft - timelineOffsetX - TIMELINE_OFFSET_CANVAS_LEFT;
-
-      onClick?.(totalX);
-    } else {
-      console.log('Ruler drag ended - no click action');
-    }
+  const onPointerUp = (event: PointerEvent<HTMLCanvasElement>) => {
+    const drag = dragRef.current;
+    dragRef.current = null;
+    setDragging(false);
+    if (!drag || drag.dragged) return;
+    const x = event.clientX - event.currentTarget.getBoundingClientRect().left;
+    onClick(x + scrollLeft - offsetX);
   };
-
-  const handleLocalTouchEnd = event => {
-    console.log('Ruler local touch end');
-
-    // Check if we dragged before resetting state
-    const wasDragging = dragRef.current.isDragging;
-    const hadDragged = dragRef.current.hasDragged;
-
-    // Always reset drag state on local touch end
-    if (wasDragging) {
-      dragRef.current.isDragging = false;
-      dragRef.current.hasDragged = false;
-      setIsDragging(false);
-      setHasDragged(false);
-    }
-
-    // Only handle tap if we haven't dragged at all
-    if (!hadDragged) {
-      console.log('Ruler tap - seeking to position');
-      const canvas = canvasRef.current;
-      if (!canvas) return;
-
-      // Get the bounding box of the canvas to calculate the relative touch position
-      const rect = canvas.getBoundingClientRect();
-      const touch = event.changedTouches[0];
-      const touchX = touch.clientX - rect.left;
-
-      // Calculate total x position, including scrollLeft
-      const totalX = touchX + scrollLeft - timelineOffsetX - TIMELINE_OFFSET_CANVAS_LEFT;
-
-      onClick?.(totalX);
-    } else {
-      console.log('Ruler drag ended - no tap action');
-    }
-  };
-
-  // Add global mouse and touch event listeners for drag
-  useEffect(() => {
-    if (isDragging) {
-      document.addEventListener('mousemove', handleMouseMove);
-      document.addEventListener('mouseup', handleMouseUp);
-      document.addEventListener('touchmove', handleTouchMove, {
-        passive: false,
-      });
-      document.addEventListener('touchend', handleTouchEnd);
-
-      return () => {
-        document.removeEventListener('mousemove', handleMouseMove);
-        document.removeEventListener('mouseup', handleMouseUp);
-        document.removeEventListener('touchmove', handleTouchMove);
-        document.removeEventListener('touchend', handleTouchEnd);
-      };
-    }
-  }, [isDragging, handleMouseMove, handleMouseUp, handleTouchMove, handleTouchEnd]);
 
   return (
-    <div
-      className='border-t border-gray-300'
-      style={{
-        position: 'relative',
-        width: '100%',
-        height: `${canvasSize.height}px`,
-      }}
-    >
+    <div className='relative w-full border-t border-white/10' style={{ height: HEIGHT }}>
       <canvas
-        onMouseDown={handleMouseDown}
-        onMouseUp={handleLocalMouseUp}
-        onTouchStart={handleTouchStart}
-        onTouchMove={handleTouchMove}
-        onTouchEnd={handleLocalTouchEnd}
         ref={canvasRef}
-        height={canvasSize.height}
-        // className='border border-red-500'
-        style={{
-          cursor: isDragging ? 'grabbing' : 'grab',
-          width: '100%',
-          display: 'block',
-          touchAction: 'none', // Prevent default touch behaviors
+        height={HEIGHT}
+        onPointerDown={onPointerDown}
+        onPointerMove={onPointerMove}
+        onPointerUp={onPointerUp}
+        onPointerCancel={() => {
+          dragRef.current = null;
+          setDragging(false);
         }}
+        className='block w-full touch-none'
+        style={{ cursor: dragging ? 'grabbing' : 'grab' }}
       />
     </div>
   );

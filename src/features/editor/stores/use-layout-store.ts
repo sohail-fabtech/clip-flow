@@ -1,22 +1,22 @@
 import { create } from 'zustand';
-import type { ITrackItem } from '@designcombo/types';
+import type { TrackItem } from '@/features/editor/types';
 
 interface LayoutStore {
   activeMenuItem: string;
   showMenuItem: boolean;
-  cropTarget: ITrackItem | null;
+  cropTarget: TrackItem | null;
   floatingControl: string;
   drawerOpen: boolean;
   controItemDrawerOpen: boolean;
   typeControlItem: string;
   labelControlItem: string;
-  trackItem: ITrackItem | null;
-  setCropTarget: (cropTarget: ITrackItem | null) => void;
+  trackItem: TrackItem | null;
+  setCropTarget: (cropTarget: TrackItem | null) => void;
   setActiveMenuItem: (activeMenuItem: string) => void;
   setShowMenuItem: (showMenuItem: boolean) => void;
   setFloatingControl: (floatingControl: string) => void;
   setDrawerOpen: (drawerOpen: boolean) => void;
-  setTrackItem: (trackItem: ITrackItem | null) => void;
+  setTrackItem: (trackItem: TrackItem | null) => void;
   setControItemDrawerOpen: (controItemDrawerOpen: boolean) => void;
   setTypeControlItem: (typeControlItem: string) => void;
   setLabelControlItem: (labelControlItem: string) => void;
