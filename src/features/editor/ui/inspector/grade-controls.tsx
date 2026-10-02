@@ -7,15 +7,15 @@ import { cn } from '@/lib/utils';
 const SIZE = 236;
 const HEIGHT = 180;
 
-interface CurveEditorProps {
-  channels: { key: string; label: string; color: string }[];
-  curves: Record<string, CurvePoint[]>;
-  onChange: (key: string, points: CurvePoint[], phase: 'live' | 'commit') => void;
+interface CurveEditorProps<K extends string> {
+  channels: { key: K; label: string; color: string }[];
+  curves: Record<K, CurvePoint[]>;
+  onChange: (key: K, points: CurvePoint[], phase: 'live' | 'commit') => void;
   background?: string;
   hue?: boolean;
 }
 
-export function CurveEditor({ channels, curves, onChange, background, hue }: CurveEditorProps) {
+export function CurveEditor<K extends string>({ channels, curves, onChange, background, hue }: CurveEditorProps<K>) {
   const [active, setActive] = useState(channels[0].key);
   const svgRef = useRef<SVGSVGElement>(null);
   const points = curves[active];

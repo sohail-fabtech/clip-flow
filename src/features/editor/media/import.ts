@@ -87,6 +87,3 @@ export function importUrl(url: string) {
   });
 }
 
-export async function addLibraryAsset(src: string, name: string, kind: AssetKind) {
-  return track(name, job => finalize(job, src, name, kind, 0));
-}
