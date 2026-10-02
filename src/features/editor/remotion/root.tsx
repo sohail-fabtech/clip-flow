@@ -1,35 +1,19 @@
-import { useState } from 'react';
-import { Composition as RemotionComposition, continueRender, delayRender } from 'remotion';
-import type { IDesign } from '@designcombo/types';
-import Composition from '@/features/editor/player/composition';
-import useStore from '@/features/editor/stores/use-store';
+import { Composition } from 'remotion';
+import { EditorComposition, type CompositionProps } from '@/features/editor/render/composition';
+import { projectDuration } from '@/features/editor/engine/edits';
+import { createProject } from '@/features/editor/model/defaults';
 import { COMPOSITION_ID } from '@/features/editor/remotion/constants';
-import { fontsOfDesign, loadFonts } from '@/features/editor/utils/fonts';
-
-interface RenderProps extends Record<string, unknown> {
-  design: IDesign;
-}
-
-const RenderComposition = ({ design }: RenderProps) => {
-  useState(() => {
-    const { structure = [], background, duration, ...rest } = design;
-    useStore.setState({ ...rest, structure, ...(background && { background }), ...(duration && { duration }) });
-    const handle = delayRender('Loading fonts');
-    loadFonts(fontsOfDesign(design)).finally(() => continueRender(handle));
-  });
-  return <Composition />;
-};
 
 export const RemotionRoot = () => (
-  <RemotionComposition
+  <Composition
     id={COMPOSITION_ID}
-    component={RenderComposition}
-    defaultProps={{ design: {} as IDesign }}
-    calculateMetadata={({ props: { design } }) => ({
-      fps: design.fps,
-      width: design.size.width,
-      height: design.size.height,
-      durationInFrames: Math.max(1, Math.round(((design.duration ?? 0) / 1000) * design.fps)),
+    component={EditorComposition}
+    defaultProps={{ project: createProject() } satisfies CompositionProps}
+    calculateMetadata={({ props: { project } }) => ({
+      fps: project.settings.fps,
+      width: project.settings.width,
+      height: project.settings.height,
+      durationInFrames: Math.max(1, projectDuration(project)),
     })}
   />
 );

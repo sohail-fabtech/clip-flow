@@ -23,6 +23,7 @@ const CONTENT_TYPES: Record<string, string> = {
   '.webp': 'image/webp',
   '.svg': 'image/svg+xml',
   '.json': 'application/json',
+  '.cube': 'application/x-cube-lut',
 };
 
 const EXTENSIONS = Object.fromEntries(Object.entries(CONTENT_TYPES).map(([ext, type]) => [type, ext]));
@@ -33,6 +34,9 @@ export const contentTypeOf = (file: string) =>
 export const extensionOf = (contentType: string) => EXTENSIONS[contentType.split(';')[0].trim()] ?? '';
 
 export const isMediaType = (contentType: string) => /^(video|audio|image)\//.test(contentType);
+
+export const isUploadType = (contentType: string) =>
+  isMediaType(contentType) || contentType === 'application/x-cube-lut';
 
 export function storageKey(folder: 'uploads' | 'renders' | 'voice-overs', fileName: string) {
   const safe = path

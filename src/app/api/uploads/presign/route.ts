@@ -1,4 +1,4 @@
-import { contentTypeOf, isMediaType, publicUrl, storageKey } from '@/server/storage';
+import { contentTypeOf, isUploadType, publicUrl, storageKey } from '@/server/storage';
 
 export async function POST(request: Request) {
   const { fileNames } = (await request.json()) as { fileNames?: string[] };
@@ -6,7 +6,7 @@ export async function POST(request: Request) {
     return Response.json({ error: 'fileNames is required' }, { status: 400 });
   }
 
-  const unsupported = fileNames.find(name => !isMediaType(contentTypeOf(name)));
+  const unsupported = fileNames.find(name => !isUploadType(contentTypeOf(name)));
   if (unsupported) return Response.json({ error: `Unsupported file type: ${unsupported}` }, { status: 400 });
 
   const uploads = fileNames.map(fileName => {
